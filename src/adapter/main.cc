@@ -46,9 +46,7 @@ int main(int argc, char *argv[])
     optParser.addFlag("f", 1);
 
     SoRParser sorParser;
-    SoRCLI cmd = SoRCLI::UNKNOWN;
     std::vector<std::string> cmdArgs;
-    bool hasCmd = false;
 
     std::string filename;
     // int size = 0;
@@ -76,15 +74,12 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    // if (found_start)
-    //     sorParser.setDataStart(start);
-    // if (found_size)
-    //     sorParser.setDataSize(size);
-
     // getting total row number
+    // this counts the number of newlines in the file, but because the end of the file does not have a newline, we add 1
     std::ifstream inFile(filename);
     unsigned int numRows = std::count(std::istreambuf_iterator<char>(inFile),
-                                      std::istreambuf_iterator<char>(), '\n');
+                                      std::istreambuf_iterator<char>(), '\n') +
+                           1;
     // getting total col number
     unsigned int numCols = sorParser.getNumCols();
 
@@ -121,30 +116,37 @@ int main(int argc, char *argv[])
         {
             std::string toAdd = sorParser.getColIdxStr(j, i);
 
-            switch (df->get_schema().col_type(j))
+            char currCol = df->get_schema().col_type(j);
+
+            if (currCol == 'B')
             {
-            case 'B':
                 bool b_ = std::stoi(toAdd);
                 r->set(j, b_);
-                break;
-            case 'I':
+            }
+            else if (currCol == 'I')
+            {
                 int i_ = std::stoi(toAdd);
                 r->set(j, i_);
-                break;
-            case 'F':
+            }
+            else if (currCol == 'F')
+            {
                 float f_ = std::stof(toAdd);
                 r->set(j, f_);
-                break;
-            case 'S':
+            }
+            else if (currCol == 'S')
+            {
                 String *s_ = new String(toAdd.c_str());
                 r->set(j, s_);
-                break;
             }
         }
         df->add_row(*r);
     }
 
     delete r;
+
+    RowPrinter rp = RowPrinter();
+
+    df->map(rp);
 
     return 0;
 }

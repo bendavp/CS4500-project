@@ -14,7 +14,7 @@ build:
 	docker run -ti -v "`pwd`":/test sorer:0.1 bash -c "cd /test ; make sorer"
 
 run: sorer
-	./sorer -f ../../data/test.sor
+	./sorer -f ../../data/test.sor -print_col_idx 2 0
 
 docker: run
 
