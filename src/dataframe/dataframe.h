@@ -1,7 +1,7 @@
 //lang::Cpp
 
 #include "schema.h"
-#include "thread.h"
+#include "../utils/thread.h"
 
 #pragma once
 

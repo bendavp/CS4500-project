@@ -5,6 +5,7 @@
 #include "OptParser.hh"
 #include "SoRParser.hh"
 #include "StrConverter.hh"
+#include "../dataframe/dataframe.h"
 
 void badArgError(const std::string &arg)
 {
@@ -113,7 +114,7 @@ int main(int argc, char *argv[])
     DataFrame *df = new DataFrame(*s);
 
     // filling in dataframe from the sorparser
-    Row *r = new Row(df->getSchema());
+    Row *r = new Row(df->get_schema());
     for (unsigned int i = 0; i < numRows; i++)
     {
         for (unsigned int j = 0; j < numCols; j++)
@@ -135,7 +136,7 @@ int main(int argc, char *argv[])
                 r->set(j, f_);
                 break;
             case 'S':
-                String s_ = new String(toAdd.c_str());
+                String *s_ = new String(toAdd.c_str());
                 r->set(j, s_);
                 break;
             }
