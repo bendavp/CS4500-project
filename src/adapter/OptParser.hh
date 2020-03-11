@@ -5,6 +5,9 @@
 #include <utility>
 #include <vector>
 
+// Code forked from Boat
+// https://github.com/gyroknight/boat-a1p1
+
 using Opt = std::pair<std::string, std::vector<std::string>>;
 
 /**
@@ -14,11 +17,12 @@ using Opt = std::pair<std::string, std::vector<std::string>>;
  *
  * Inspired by the behavior of getopt() from the UNIX Standard Library.
  */
-class OptParser {
-   public:
+class OptParser
+{
+public:
     OptParser();
 
-    void addFlag(const char* flag, int opts);
+    void addFlag(const char *flag, int opts);
 
     /**
      * @brief Gets the next option from the argument list.
@@ -30,12 +34,12 @@ class OptParser {
      * @return int Either the option flag, 1 for non-options, '?' for unknown
      * options, or -1 for end of options.
      */
-    Opt getOpt(int argc, char** argv);
+    Opt getOpt(int argc, char **argv);
 
-   private:
+private:
     //! The next option to process
     int optIdx = 1;
     std::unordered_map<std::string, int> flagOpts;
 
-    bool isOpt(const char* value);
+    bool isOpt(const char *value);
 };

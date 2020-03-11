@@ -3,7 +3,11 @@
 #include <functional>
 #include <string>
 
-namespace StrConverter {
+// Code forked from Boat
+// https://github.com/gyroknight/boat-a1p1
+
+namespace StrConverter
+{
 /**
  * @brief Checks if a string can be fully converted to the type specified using
  * the provided converter.
@@ -19,8 +23,8 @@ namespace StrConverter {
  */
 template <typename T>
 bool canConvert(
-    const std::string& s, T& value,
-    std::function<T(const std::string&, size_t*)> stringConverter);
+    const std::string &s, T &value,
+    std::function<T(const std::string &, size_t *)> stringConverter);
 /**
  * @brief Checks if a string is an unsigned integer.
  *
@@ -32,5 +36,5 @@ bool canConvert(
  * @return true if the string is an unsigned integer
  * @return false if it is not
  */
-bool isUInt(const std::string& s, unsigned long& value);
-}  // namespace StrConverter
+bool isUInt(const std::string &s, unsigned long &value);
+} // namespace StrConverter

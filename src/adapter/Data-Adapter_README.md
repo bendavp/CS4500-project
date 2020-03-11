@@ -1,3 +1,5 @@
+### Code forked from Boat https://github.com/gyroknight/boat-a1p1
+
 # main.cpp
 
 This file handles parsing CLI arguments withthe OptParser and handing them off

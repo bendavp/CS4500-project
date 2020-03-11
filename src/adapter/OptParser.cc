@@ -2,9 +2,13 @@
 
 #include "OptParser.hh"
 
+// Code forked from Boat
+// https://github.com/gyroknight/boat-a1p1
+
 OptParser::OptParser() {}
 
-void OptParser::addFlag(const char* flag, int opts) {
+void OptParser::addFlag(const char *flag, int opts)
+{
     flagOpts[std::string(flag)] = opts;
 }
 
@@ -18,23 +22,32 @@ void OptParser::addFlag(const char* flag, int opts) {
  * @return int Either the option flag, 1 for non-options, '?' for unknown
  * options, or -1 for end of options.
  */
-Opt OptParser::getOpt(int argc, char** argv) {
+Opt OptParser::getOpt(int argc, char **argv)
+{
     std::vector<std::string> optVals;
     Opt opt = std::make_pair("", optVals);
 
-    if (optIdx < argc) {
-        const char* const arg = argv[optIdx];
-        if (isOpt(argv[optIdx])) {
+    if (optIdx < argc)
+    {
+        const char *const arg = argv[optIdx];
+        if (isOpt(argv[optIdx]))
+        {
             std::string flag = arg + 1;
-            if (flagOpts.count(flag) && optIdx + flagOpts[flag] < argc) {
+            if (flagOpts.count(flag) && optIdx + flagOpts[flag] < argc)
+            {
                 opt.first = flag;
-                for (int ii = 0; ii < flagOpts[flag]; ii++) {
+                for (int ii = 0; ii < flagOpts[flag]; ii++)
+                {
                     optVals.push_back(std::string(argv[++optIdx]));
                 }
-            } else {
+            }
+            else
+            {
                 opt.first = "?";
             }
-        } else {
+        }
+        else
+        {
             // Non-option program arguments
             opt.first = "non-flag";
             optVals.push_back(argv[optIdx]);
@@ -47,6 +60,7 @@ Opt OptParser::getOpt(int argc, char** argv) {
     return opt;
 }
 
-bool OptParser::isOpt(const char* value) {
+bool OptParser::isOpt(const char *value)
+{
     return strlen(value) >= 2 && value[0] == '-' && isalpha(value[1]);
 }

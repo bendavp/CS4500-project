@@ -8,24 +8,34 @@
 #include <string>
 #include <vector>
 
+// Code forked from Boat
+// https://github.com/gyroknight/boat-a1p1
+
 using SoRCoord = std::pair<unsigned int, unsigned int>;
 using SoRCol = std::vector<std::optional<std::string>>;
 using SoRRow = std::vector<std::optional<std::string>>;
 using SoRData = std::vector<SoRCol>;
 
 //! Represents the supported types of SoR data
-enum class SoRType { BOOL, INT, FLOAT, STRING };
+enum class SoRType
+{
+    BOOL,
+    INT,
+    FLOAT,
+    STRING
+};
 
 // useful print operators
-std::ostream& operator<<(std::ostream& os, const SoRType& type);
-std::ostream& operator<<(std::ostream& os,
-                         const std::optional<SoRType>& optType);
-std::ostream& operator<<(std::ostream& os,
-                         const std::optional<std::string>& optStr);
+std::ostream &operator<<(std::ostream &os, const SoRType &type);
+std::ostream &operator<<(std::ostream &os,
+                         const std::optional<SoRType> &optType);
+std::ostream &operator<<(std::ostream &os,
+                         const std::optional<std::string> &optStr);
 
-namespace {
+namespace
+{
 constexpr size_t READBUFFER_SIZE_BYTES = 1024 * 1024;
-}  // namespace
+} // namespace
 
 /**
  * @brief A parser that handles interpreting schema-on-read data files
@@ -38,14 +48,15 @@ constexpr size_t READBUFFER_SIZE_BYTES = 1024 * 1024;
  * with the most common datatype of each column used to determine the column's
  * content.
  */
-class SoRParser {
-   public:
+class SoRParser
+{
+public:
     //! Constructs a SoRParser
     SoRParser();
 
     //! Initializes parser with set file and determines schema with up to the
     //! first 500 lines
-    bool initialize(std::string& filename);
+    bool initialize(std::string &filename);
 
     //! Gets the type of the specified column
     SoRType getColType(unsigned int col);
@@ -61,36 +72,40 @@ class SoRParser {
     bool isMissingIdx(unsigned int col, unsigned int offset);
 
     //! Converts a string into a row of SoR cells
-    SoRRow parseFields(std::string& row);
+    SoRRow parseFields(std::string &row);
 
-    void setData(const std::string& path);
+    void setData(const std::string &path);
     void setDataStart(unsigned int start);
     void setDataSize(unsigned int size);
 
-   private:
-    std::ifstream data;      //! Stream of the raw data file
-    unsigned int dataStart;  //! Data start point in bytes from the start of the
-                             //! file
-    unsigned int dataSize;   //! The readable size of the data (only relevant if
-                             //! less that file size)
-    unsigned int numCols;    //! The number of columns for this schema
-    size_t cacheOffset;      //! The index represented by the start of the cache
-    std::vector<SoRType> colTypes;  //! The datatypes of each column
-    SoRData cache;  //! Cached version of part of the file, determined by
-                    //! CACHE_SIZE
-    std::vector<std::streampos> seenCaches;  //! Stream positions of cache start
-                                             //! locations in ascending order
-    size_t filesize;                         //! The size of the file
-    std::streampos dataEnd;  //! The end of the file, only relevant if dataSize
-                             //! is smaller than the file size from the start
-                             //! offset
+    // functions added by Amy and Ben
+    // tang.amy@husky.neu.edu, kosiborod.b@husky.neu.edu
+    unsigned int getNumCols();
+
+private:
+    std::ifstream data;                     //! Stream of the raw data file
+    unsigned int dataStart;                 //! Data start point in bytes from the start of the
+                                            //! file
+    unsigned int dataSize;                  //! The readable size of the data (only relevant if
+                                            //! less that file size)
+    unsigned int numCols;                   //! The number of columns for this schema
+    size_t cacheOffset;                     //! The index represented by the start of the cache
+    std::vector<SoRType> colTypes;          //! The datatypes of each column
+    SoRData cache;                          //! Cached version of part of the file, determined by
+                                            //! CACHE_SIZE
+    std::vector<std::streampos> seenCaches; //! Stream positions of cache start
+                                            //! locations in ascending order
+    size_t filesize;                        //! The size of the file
+    std::streampos dataEnd;                 //! The end of the file, only relevant if dataSize
+                                            //! is smaller than the file size from the start
+                                            //! offset
     std::shared_ptr<std::array<char, READBUFFER_SIZE_BYTES>> readBuffer;
 
     //! Determines the schema of the file using a sample of raw lines
-    void setSchema(std::vector<std::string>& sample);
+    void setSchema(std::vector<std::string> &sample);
     void readInitial();
-    SoRType findColType(const SoRCol& col);
-    void addRow(SoRRow& row);
+    SoRType findColType(const SoRCol &col);
+    void addRow(SoRRow &row);
     void seekRow(unsigned int offset);
 
     void balanceCache();

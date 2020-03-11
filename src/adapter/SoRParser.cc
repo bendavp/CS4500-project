@@ -7,39 +7,49 @@
 #include "SoRParser.hh"
 #include "StrConverter.hh"
 
-namespace {
+// Code forked from Boat
+// https://github.com/gyroknight/boat-a1p1
+
+namespace
+{
 constexpr int SCHEMA_DEF_LINES = 500;
 constexpr int CACHE_SIZE = 512;
-}  // namespace
+} // namespace
 
-std::ostream& operator<<(std::ostream& os, const SoRType& type) {
-    switch (type) {
-        case SoRType::BOOL:
-            os << "BOOL";
-            break;
-        case SoRType::INT:
-            os << "INT";
-            break;
-        case SoRType::FLOAT:
-            os << "FLOAT";
-            break;
-        case SoRType::STRING:
-            os << "STRING";
-            break;
+std::ostream &operator<<(std::ostream &os, const SoRType &type)
+{
+    switch (type)
+    {
+    case SoRType::BOOL:
+        os << "BOOL";
+        break;
+    case SoRType::INT:
+        os << "INT";
+        break;
+    case SoRType::FLOAT:
+        os << "FLOAT";
+        break;
+    case SoRType::STRING:
+        os << "STRING";
+        break;
     }
 
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os,
-                         const std::optional<SoRType>& optType) {
-    if (!optType.has_value()) return os;
+std::ostream &operator<<(std::ostream &os,
+                         const std::optional<SoRType> &optType)
+{
+    if (!optType.has_value())
+        return os;
     return os << *optType;
 }
 
-std::ostream& operator<<(std::ostream& os,
-                         const std::optional<std::string>& optStr) {
-    if (!optStr.has_value()) return os;
+std::ostream &operator<<(std::ostream &os,
+                         const std::optional<std::string> &optStr)
+{
+    if (!optStr.has_value())
+        return os;
     return os << *optStr;
 }
 
@@ -48,7 +58,8 @@ SoRParser::SoRParser()
       dataSize(0),
       numCols(0),
       cacheOffset(0),
-      readBuffer(std::make_shared<std::array<char, READBUFFER_SIZE_BYTES>>()) {
+      readBuffer(std::make_shared<std::array<char, READBUFFER_SIZE_BYTES>>())
+{
     data.rdbuf()->pubsetbuf(readBuffer->data(), readBuffer->size());
 }
 /**
@@ -59,10 +70,14 @@ SoRParser::SoRParser()
  * @return true if parser successfully initialized with file
  * @return false if not
  */
-bool SoRParser::initialize(std::string& filename) {
-    try {
+bool SoRParser::initialize(std::string &filename)
+{
+    try
+    {
         setData(filename);
-    } catch (std::ios_base::failure& e) {
+    }
+    catch (std::ios_base::failure &e)
+    {
         return false;
     }
 
@@ -84,8 +99,10 @@ bool SoRParser::initialize(std::string& filename) {
 SoRType SoRParser::getColType(unsigned int col) { return colTypes.at(col); }
 
 std::optional<std::string> SoRParser::getColIdx(unsigned int col,
-                                                unsigned int offset) {
-    if (col >= numCols) throw std::out_of_range("Invalid column");
+                                                unsigned int offset)
+{
+    if (col >= numCols)
+        throw std::out_of_range("Invalid column");
     seekRow(offset);
 
     if (offset >= cacheOffset + cache.front().size())
@@ -93,27 +110,30 @@ std::optional<std::string> SoRParser::getColIdx(unsigned int col,
     return cache[col][offset % CACHE_SIZE];
 }
 
-std::string SoRParser::getColIdxStr(unsigned int col, unsigned int offset) {
+std::string SoRParser::getColIdxStr(unsigned int col, unsigned int offset)
+{
     SoRType colType = getColType(col);
     std::optional<std::string> value = getColIdx(col, offset);
 
     std::string ret;
 
-    if (value.has_value()) {
-        switch (colType) {
-            case SoRType::BOOL:
-            case SoRType::INT:
-                ret.append(std::to_string(std::stoi(*value)));
-                break;
-            case SoRType::FLOAT:
-                ret.append(std::to_string(std::stof(*value)));
-                break;
-            case SoRType::STRING:
-                ret.push_back('"');
-                ret.append(*value).push_back('"');
-                break;
-            default:
-                break;
+    if (value.has_value())
+    {
+        switch (colType)
+        {
+        case SoRType::BOOL:
+        case SoRType::INT:
+            ret.append(std::to_string(std::stoi(*value)));
+            break;
+        case SoRType::FLOAT:
+            ret.append(std::to_string(std::stof(*value)));
+            break;
+        case SoRType::STRING:
+            ret.push_back('"');
+            ret.append(*value).push_back('"');
+            break;
+        default:
+            break;
         }
     }
 
@@ -128,7 +148,8 @@ std::string SoRParser::getColIdxStr(unsigned int col, unsigned int offset) {
  * @return std::optional<bool> true if missing, false if not. Empty if invalid
  * index.
  */
-bool SoRParser::isMissingIdx(unsigned int col, unsigned int offset) {
+bool SoRParser::isMissingIdx(unsigned int col, unsigned int offset)
+{
     return !getColIdx(col, offset).has_value();
 }
 
@@ -140,7 +161,8 @@ bool SoRParser::isMissingIdx(unsigned int col, unsigned int offset) {
  * @param row the row to parse
  * @return std::vector<std::string> the vector of values
  */
-SoRRow SoRParser::parseFields(std::string& row) {
+SoRRow SoRParser::parseFields(std::string &row)
+{
     // TODO(mike): Add support for "" as a valid string
     SoRRow fields;
     std::ostringstream field;
@@ -151,11 +173,15 @@ SoRRow SoRParser::parseFields(std::string& row) {
     bool fieldComplete = false;
     bool fieldEmpty = true;
 
-    for (char c : row) {
-        if (c == '<' && !inField) {
+    for (char c : row)
+    {
+        if (c == '<' && !inField)
+        {
             // start of a tag
             inField = true;
-        } else if (c == '>' && inField && !inQuotes) {
+        }
+        else if (c == '>' && inField && !inQuotes)
+        {
             // end of a tag
             inField = false;
             fieldComplete = false;
@@ -165,35 +191,51 @@ SoRRow SoRParser::parseFields(std::string& row) {
                 fields.push_back(std::nullopt);
             field.str("");
             fieldEmpty = true;
-        } else if (c == '"') {
+        }
+        else if (c == '"')
+        {
             // TODO add quotations to the field?
-            if (inField && !inQuotes) {
+            if (inField && !inQuotes)
+            {
                 // start of quotes
                 inQuotes = true;
                 fieldEmpty = false;
-            } else if (inQuotes && !fieldComplete) {
+            }
+            else if (inQuotes && !fieldComplete)
+            {
                 // end of quotes
                 inQuotes = false;
                 fieldComplete = true;
-            } else if (inField && fieldComplete) {
+            }
+            else if (inField && fieldComplete)
+            {
                 // start of quotes but inside field
                 fields.clear();
                 return fields;
             }
-        } else {
+        }
+        else
+        {
             // non-special characters or whitespace
-            if (inField && !fieldComplete) {
-                if (isspace(c) && !inQuotes) {
-                    if (!field.str().empty()) {
+            if (inField && !fieldComplete)
+            {
+                if (isspace(c) && !inQuotes)
+                {
+                    if (!field.str().empty())
+                    {
                         // first trailing whitespace; no more characters allowed
                         // in this field
                         fieldComplete = true;
                     }
-                } else {
+                }
+                else
+                {
                     // normal character
                     field << c;
                 }
-            } else if (inField && !isspace(c)) {
+            }
+            else if (inField && !isspace(c))
+            {
                 // got a non-whitespace character, but the field is already
                 // done; invalid
                 fields.clear();
@@ -205,7 +247,8 @@ SoRRow SoRParser::parseFields(std::string& row) {
     return fields;
 }
 
-void SoRParser::setData(const std::string& path) {
+void SoRParser::setData(const std::string &path)
+{
     data.open(path);
     if (!data.is_open())
         throw std::ios_base::failure(
@@ -221,8 +264,10 @@ void SoRParser::setData(const std::string& path) {
     dataSize = filesize;
 }
 
-void SoRParser::setDataStart(unsigned int start) {
-    if (start >= filesize) throw std::out_of_range("Data start past EOF");
+void SoRParser::setDataStart(unsigned int start)
+{
+    if (start >= filesize)
+        throw std::out_of_range("Data start past EOF");
 
     clearCache();
     seenCaches.clear();
@@ -239,9 +284,11 @@ void SoRParser::setDataStart(unsigned int start) {
     fillCache();
 }
 
-void SoRParser::setDataSize(unsigned int size) {
+void SoRParser::setDataSize(unsigned int size)
+{
     dataSize = size;
-    if (dataStart + dataSize < filesize) {
+    if (dataStart + dataSize < filesize)
+    {
         data.clear();
         data.seekg(0, std::ios_base::beg);
         data.ignore(dataStart + size);
@@ -257,14 +304,16 @@ void SoRParser::setDataSize(unsigned int size) {
  *
  * @param sample the sample
  */
-void SoRParser::setSchema(std::vector<std::string>& sample) {
-    for (std::string& line : sample) {
+void SoRParser::setSchema(std::vector<std::string> &sample)
+{
+    for (std::string &line : sample)
+    {
         // split line into fields (i.e. things between tags)
         SoRRow fields = parseFields(line);
 
         // use longest line for the schema
         numCols = numCols < fields.size() ? fields.size() : numCols;
-        balanceCache();  // make cache rectangular
+        balanceCache(); // make cache rectangular
 
         addRow(fields);
     }
@@ -273,19 +322,24 @@ void SoRParser::setSchema(std::vector<std::string>& sample) {
 
     // assign types for each column
     colTypes.resize(numCols);
-    for (unsigned int ii = 0; ii < numCols; ii++) {
+    for (unsigned int ii = 0; ii < numCols; ii++)
+    {
         colTypes[ii] = findColType(cache[ii]);
     }
 }
 
 //! Reads and gets schema from first 500 lines of the file
-void SoRParser::readInitial() {
-    if (!data.is_open()) return;
+void SoRParser::readInitial()
+{
+    if (!data.is_open())
+        return;
 
     // fill vector with first 500 lines of the file
     std::vector<std::string> sample;
-    for (int ii = 0; ii < SCHEMA_DEF_LINES; ii++) {
-        if (data.eof()) break;
+    for (int ii = 0; ii < SCHEMA_DEF_LINES; ii++)
+    {
+        if (data.eof())
+            break;
         std::string line;
         std::getline(data, line, '\n');
         sample.push_back(line);
@@ -295,27 +349,36 @@ void SoRParser::readInitial() {
     setSchema(sample);
 }
 
-SoRType SoRParser::findColType(const SoRCol& col) {
-    SoRType colType = SoRType::BOOL;  // default col type
+SoRType SoRParser::findColType(const SoRCol &col)
+{
+    SoRType colType = SoRType::BOOL; // default col type
     size_t endIdx;
 
-    for (const std::optional<std::string>& cell : col) {
-        if (!cell.has_value()) continue;
+    for (const std::optional<std::string> &cell : col)
+    {
+        if (!cell.has_value())
+            continue;
 
         SoRType cellType;
         int cellInt;
-        const std::string& cellVal = *cell;
+        const std::string &cellVal = *cell;
 
-        try {
+        try
+        {
             cellInt = stoi(cellVal, &endIdx);
             if (endIdx == cellVal.size() && (cellInt == 0 || cellInt == 1) &&
-                cellVal.size() == 1) {
+                cellVal.size() == 1)
+            {
                 // if cell is int, equals 0 or 1, and only has length of 1, it
                 // is a bool
                 cellType = SoRType::BOOL;
-            } else if (endIdx == cellVal.size()) {
+            }
+            else if (endIdx == cellVal.size())
+            {
                 cellType = SoRType::INT;
-            } else {
+            }
+            else
+            {
                 // starts with a number but hit something else (. or char)
                 stof(cellVal, &endIdx);
                 if (endIdx == cellVal.size())
@@ -325,8 +388,11 @@ SoRType SoRParser::findColType(const SoRCol& col) {
                     // just a string starting with a number
                     return SoRType::STRING;
             }
-        } catch (const std::invalid_argument& e) {
-            try {
+        }
+        catch (const std::invalid_argument &e)
+        {
+            try
+            {
                 // Could be float that begins with .
                 stof(cellVal, &endIdx);
                 if (endIdx == cellVal.size())
@@ -335,11 +401,15 @@ SoRType SoRParser::findColType(const SoRCol& col) {
                 else
                     // didn't completely convert to float
                     return SoRType::STRING;
-            } catch (const std::invalid_argument& e) {
+            }
+            catch (const std::invalid_argument &e)
+            {
                 // Not a float
                 return SoRType::STRING;
             }
-        } catch (const std::out_of_range& e) {
+        }
+        catch (const std::out_of_range &e)
+        {
             cellType = SoRType::FLOAT;
         }
 
@@ -350,12 +420,15 @@ SoRType SoRParser::findColType(const SoRCol& col) {
     return colType;
 }
 
-void SoRParser::addRow(SoRRow& row) {
+void SoRParser::addRow(SoRRow &row)
+{
     // fill any missing fields at the end with empty strings (i.e. <>)
-    while (row.size() < numCols) row.push_back(std::nullopt);
+    while (row.size() < numCols)
+        row.push_back(std::nullopt);
 
     // fill this column
-    for (unsigned int ii = 0; ii < numCols; ii++) cache[ii].push_back(row[ii]);
+    for (unsigned int ii = 0; ii < numCols; ii++)
+        cache[ii].push_back(row[ii]);
 }
 
 /**
@@ -363,9 +436,11 @@ void SoRParser::addRow(SoRRow& row) {
  *
  * @param offset The column offset (row)
  */
-void SoRParser::seekRow(unsigned int offset) {
+void SoRParser::seekRow(unsigned int offset)
+{
     size_t cacheNum = offset / CACHE_SIZE;
-    if (cacheNum * CACHE_SIZE != cacheOffset) loadCache(cacheNum);
+    if (cacheNum * CACHE_SIZE != cacheOffset)
+        loadCache(cacheNum);
 }
 
 /**
@@ -374,14 +449,18 @@ void SoRParser::seekRow(unsigned int offset) {
  * until every column is the same length as the first one.
  *
  */
-void SoRParser::balanceCache() {
-    while (cache.size() < numCols) {
+void SoRParser::balanceCache()
+{
+    while (cache.size() < numCols)
+    {
         cache.push_back(SoRCol());
     }
 
     size_t numRows = cache.front().size();
-    for (SoRCol& col : cache) {
-        while (col.size() < numRows) {
+    for (SoRCol &col : cache)
+    {
+        while (col.size() < numRows)
+        {
             col.push_back(std::nullopt);
         }
     }
@@ -392,15 +471,19 @@ void SoRParser::balanceCache() {
  *
  * @param cacheNum The cache index
  */
-void SoRParser::loadCache(size_t cacheNum) {
+void SoRParser::loadCache(size_t cacheNum)
+{
     // Find matching cache location if possible
-    if (cacheNum >= seenCaches.size()) {
+    if (cacheNum >= seenCaches.size())
+    {
         data.clear();
         data.seekg(seenCaches.back());
         unsigned int seenRows = 0;
         data.clear();
-        while (seenCaches.size() < cacheNum + 1 && !data.eof()) {
-            if (seenRows == CACHE_SIZE) {
+        while (seenCaches.size() < cacheNum + 1 && !data.eof())
+        {
+            if (seenRows == CACHE_SIZE)
+            {
                 seenCaches.push_back(data.tellg());
                 seenRows = 0;
             }
@@ -413,11 +496,14 @@ void SoRParser::loadCache(size_t cacheNum) {
         }
     }
 
-    if (cacheNum < seenCaches.size()) {
+    if (cacheNum < seenCaches.size())
+    {
         data.clear();
         data.seekg(seenCaches[cacheNum]);
         cacheOffset = cacheNum * CACHE_SIZE;
-    } else {
+    }
+    else
+    {
         data.clear();
         data.seekg(seenCaches.back());
         cacheOffset = (seenCaches.size() - 1) * CACHE_SIZE;
@@ -431,8 +517,10 @@ void SoRParser::loadCache(size_t cacheNum) {
  * @brief Fills cache with valid rows at current data position until either
  * CACHE_SIZE or end of data is reached
  */
-void SoRParser::fillCache() {
-    while (cache.front().size() < CACHE_SIZE && !data.eof()) {
+void SoRParser::fillCache()
+{
+    while (cache.front().size() < CACHE_SIZE && !data.eof())
+    {
         std::string line;
         std::getline(data, line, '\n');
         SoRRow row = parseFields(line);
@@ -445,8 +533,17 @@ void SoRParser::fillCache() {
 }
 
 //! Clear the cache
-void SoRParser::clearCache() {
-    for (SoRCol& col : cache) {
+void SoRParser::clearCache()
+{
+    for (SoRCol &col : cache)
+    {
         col.clear();
     }
+}
+
+// implementation of functions added by Amy and Ben
+// tang.amy@husky.neu.edu, kosiborod.b@husky.neu.edu
+unsigned int SoRParser::getNumCols()
+{
+    return numCols;
 }
