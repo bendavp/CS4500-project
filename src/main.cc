@@ -2,10 +2,10 @@
 #include <string>
 #include <vector>
 
-#include "OptParser.hh"
-#include "SoRParser.hh"
-#include "StrConverter.hh"
-#include "../dataframe/dataframe.h"
+#include "adapter/OptParser.hh"
+#include "adapter/SoRParser.hh"
+#include "adapter/StrConverter.hh"
+#include "dataframe/dataframe.h"
 
 void badArgError(const std::string &arg)
 {
@@ -80,6 +80,7 @@ int main(int argc, char *argv[])
     unsigned int numRows = std::count(std::istreambuf_iterator<char>(inFile),
                                       std::istreambuf_iterator<char>(), '\n') +
                            1;
+
     // getting total col number
     unsigned int numCols = sorParser.getNumCols();
 
@@ -87,20 +88,21 @@ int main(int argc, char *argv[])
     char *schema_str = new char[numCols];
     for (unsigned int i = 0; i < numCols; i++)
     {
-        switch (sorParser.getColType(i))
+        if (sorParser.getColType(i) == SoRType::BOOL)
         {
-        case SoRType::BOOL:
             schema_str[i] = 'B';
-            break;
-        case SoRType::INT:
+        }
+        else if (sorParser.getColType(i) == SoRType::INT)
+        {
             schema_str[i] = 'I';
-            break;
-        case SoRType::FLOAT:
+        }
+        else if (sorParser.getColType(i) == SoRType::FLOAT)
+        {
             schema_str[i] = 'F';
-            break;
-        case SoRType::STRING:
+        }
+        else if (sorParser.getColType(i) == SoRType::STRING)
+        {
             schema_str[i] = 'S';
-            break;
         }
     }
 
