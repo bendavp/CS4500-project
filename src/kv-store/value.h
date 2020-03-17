@@ -17,8 +17,9 @@ public:
         serialized_ = nullptr;
     }
 
-    Value(DataFrame *df) : Object() : encode(df)
+    Value(DataFrame *df) : Object()
     {
+        encode(df);
     }
 
     /**
@@ -33,7 +34,7 @@ public:
         // adding num of columns then rows
         int col = df->ncols();
         int row = df->nrows();
-        builder.c(reinterpret_cast<char *> col).c(reinterpret_cast<char *> row);
+        builder.c(reinterpret_cast<char *>(col)).c(reinterpret_cast<char *>(row));
 
         // adding the col-types into the encoded
         String *schema_coltypes = df->get_schema().coltypes_;
@@ -48,7 +49,7 @@ public:
             {
                 for (int j = 0; j < row; j++)
                 {
-                    builder.c(reinterpret_cast<char *> df->get_bool(i, j));
+                    builder.c(reinterpret_cast<char *>(df->get_bool(i, j)));
                 }
             }
             // ints
@@ -56,7 +57,7 @@ public:
             {
                 for (int j = 0; j < row; j++)
                 {
-                    builder.c(reinterpret_cast<char *> df->get_int(i, j));
+                    builder.c(reinterpret_cast<char *>(df->get_int(i, j)));
                 }
             }
             // floats
@@ -64,7 +65,7 @@ public:
             {
                 for (int j = 0; j < row; j++)
                 {
-                    builder.c(reinterpret_cast<char *> df->get_float(i, j));
+                    builder.c(reinterpret_cast<char *>(df->get_float(i, j)));
                 }
             }
             // strings
@@ -72,7 +73,7 @@ public:
             {
                 for (int j = 0; j < row; j++)
                 {
-                    builder.c(df->get_string()->c_str()).c(sep);
+                    builder.c(df->get_string(i, j)->c_str()).c(sep);
                 }
             }
         }
@@ -136,7 +137,8 @@ public:
         }
         String *col_types = sb_.get();
 
-        DataFrame *decoded_ = new DataFrame(); // empty dataframe that will be filled
+        Schema scm = Schema();
+        DataFrame *decoded_ = new DataFrame(scm); // empty dataframe that will be filled
 
         for (int i = 0; i < col; i++)
         {
@@ -151,7 +153,7 @@ public:
                         bool_temp[j] = serialized_[j];
                         current++;
                     }
-                    c->push_back((bool)bool_temp);
+                    bc_->push_back((bool)bool_temp);
                 }
                 decoded_->add_column(bc_.clone(), nullptr);
                 delete bc_;
@@ -168,7 +170,7 @@ public:
                         int_temp[j] = serialized_[j];
                         current++;
                     }
-                    c->push_back((int)int_temp);
+                    ic_->push_back((int)int_temp);
                 }
                 decoded_->add_column(ic_.clone(), nullptr);
                 delete ic_;
@@ -184,7 +186,7 @@ public:
                         float_temp[j] = serialized_[j];
                         current++;
                     }
-                    c->push_back((float)float_temp);
+                    fc_->push_back((float)float_temp);
                 }
                 decoded_->add_column(fc_.clone(), nullptr);
                 delete fc_;
@@ -199,7 +201,7 @@ public:
                     int j = current;
                     while (serialized_[j] != sep)
                     {
-                        sb_.c(serialized[j]);
+                        sb_.c(serialized_[j]);
                         current++;
                         j++;
                     }
