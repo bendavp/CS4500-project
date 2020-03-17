@@ -209,41 +209,6 @@ public:
                 }
             }
         }
-        delete
-
-            return decoded_;
-        FloatColumn *fc_ = new FloatColumn();
-        for (int i = 0; i < row; i++)
-        {
-            for (int j = current; j < float_size; j++)
-            {
-                float_temp[j] = serialized_[j];
-                current++;
-            }
-            c->push_back((float)float_temp);
-        }
-        decoded_->add_column(fc_.clone(), nullptr);
-        delete fc_;
+        delete col_types;
+        return decoded_;
     }
-    // adding a String column
-    else if (col_types->at(i) == 'S')
-    {
-        StringColumn *sc_ = new StringColumn();
-        StrBuff sb_ = StrBuff();
-        for (int i = 0; i < row; i++)
-        {
-            int j = current;
-            while (serialized_[j] != sep)
-            {
-                sb_.c(serialized[j]);
-                current++;
-                j++;
-            }
-            sc_->push_back(sb_.get());
-        }
-    }
-} delete
-
-    return decoded_;
-}
-}
