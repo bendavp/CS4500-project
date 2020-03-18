@@ -64,3 +64,5 @@ We will start to troubleshoot and fix the networking from the past to prepare to
 # pls gib 100 ty :-)
 
 ![Hosico](https://www.catster.com/wp-content/uploads/2017/02/Hosico1.png)
+
+![Chess](https://i.imgur.com/ZLZL0Or.gif)
