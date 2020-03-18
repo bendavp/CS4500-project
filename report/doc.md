@@ -62,4 +62,5 @@ For this milestone, we aimed to implement functionality that will allow us to en
 We will start to troubleshoot and fix the networking from the past to prepare to integrate this into the system.
 
 # pls gib 100 ty :-)
-![Hosico](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.catster.com%2Flifestyle%2Fhosico-is-a-fluffy-scottish-cat-from-moscow-with-many-fans&psig=AOvVaw26ZMWeUCgLDSdjs8zczWMX&ust=1584650100921000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCJD00OrvpOgCFQAAAAAdAAAAABAJ)
+
+![Hosico](https://www.catster.com/wp-content/uploads/2017/02/Hosico1.png)
