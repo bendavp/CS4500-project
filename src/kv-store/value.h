@@ -60,12 +60,12 @@ public:
                     builder.c(reinterpret_cast<char *>(df->get_int(i, j)));
                 }
             }
-            // floats
+            // floats (casted into a long first due to inability to just cast float into char*)
             else if (schema_coltypes->at(i) == 'F')
             {
                 for (int j = 0; j < row; j++)
                 {
-                    builder.c(reinterpret_cast<char *>(df->get_float(i, j)));
+                    builder.c(reinterpret_cast<char *>((long)df->get_float(i, j)));
                 }
             }
             // strings
@@ -103,7 +103,7 @@ public:
         // size of the different primitives when encoded
         size_t int_size = sizeof(int);
         size_t bool_size = sizeof(bool);
-        size_t float_size = sizeof(float);
+        size_t float_size = sizeof(long);
 
         // creating temp char array to hold info before deserializing
         char *int_temp = new char[int_size];
@@ -212,3 +212,18 @@ public:
         delete col_types;
         return decoded_;
     }
+
+    bool equals(Object *other)
+    {
+        Value *other_val = dynamic_cast<Value *>(other);
+        if (other_val == nullptr)
+            return false;
+        return strcmp(other_val->serialized_, serialized_) == 0;
+    }
+
+    // hashes the serialization as if it is a string object
+    size_t hash()
+    {
+        return String(serialized_).hash();
+    }
+}

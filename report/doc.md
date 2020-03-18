@@ -28,27 +28,38 @@ The structure of the eau2 system is organized into three layers: application lay
 	- fields: home node, unique identifier of a value on that value’s home node
 	- function: 
 		- getNode() => node that this key resides on
+		- encode() => char*, converts key into serialized char* so it can be sent between nodes
+		- decode(char*) => void, takes a serialized key (char*) and fills in the information from the serialized key into the key
+		- hash() => int, from object
+		- equals(Object*) => bool, from object
 - Value: 
 	- field: char * serialized_information (can be anything)
+	- function:
+		- encode(DataFrame*) => void, serializes the DataFrame* into char* and sets the field (serialized_) to this char*
+		- decode() => Dataframe*, deserializes the field (serialized_) back into a DataFrame*
+		- equals(Object*) => bool, from object class (checks if field is equivalent)
+		- hash() => int, from object
 - KV classes: 
-	- field: Map * (maps keys to values)
+	- fields: Key** (keys), Value** (values), size_ (number of pairs in the store), memory_size_ (max capacity of array)
 	- function:
 		- get(Key k) => Value, Gets a value from a KV-store based on the key
-		- getAndWait(Key k) => Value, Gets a value from a KV-store based on the key and waits for that key to exist
+		- getAndWait(Key k) => Value, Gets a value from a KV-store based on the key and waits for that key to exist (to be implemented fully next week alongside networking layer)
 		- put(Key k, Value v) => void, putting key-value pair into the KV-store
 ### Networking Layer (Nodes)
 - we plan to start to work on troubleshooting the previous networking assignments in preparation for this; API will is TBD
 
 ## Use Cases
-TBD
+- WordCounter: Load a text file of words into the Application layer, KVstore layer will distribute the words among all available nodes, obtain the number of characters in each word (this work is distributed across multiple nodes), and aggregate the results to show to the application layer (i.e. the client)
 
 ## Open Questions
 - User interaction with the application layer?
-- Where does the serialization/deserialization happen?
 
 ## Status
-We discussed very high-level design decisions. We need to eventually implement the various layers and communication between the layers for the eau2 system.
+We discussed the classes that will make up the kvstore layer, and focused mostly on this layer for this milestone. We decided to make our Value and Key class be able to serialize/deserialize themselves (in the case of Value, it represents a serialized DataFrame, and when deserialized, it will be a DataFrame)
 
-For this milestone, we aim to implement functionality that will allow us to process a SOR data file into a DataFrame, and be able to use some basic Rowers on the DataFrame without issue. 
+For this milestone, we aimed to implement functionality that will allow us to encode/decode DataFrames into a char* as well as store these char* with Keys in the KV-store. Our goal is to get this working as if there is only one node. More specifically, we aim to be able to pass in these serialized DataFrames into the KV-store with a Key and retrieve out the Value/DataFrame with the Key. 
 
-We will start to troubleshoot and fix the networking and serialization assignments from the past to prepare to integrate these into the system.
+We will start to troubleshoot and fix the networking from the past to prepare to integrate this into the system.
+
+# pls gib 100 ty :-)
+![Hosico](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.catster.com%2Flifestyle%2Fhosico-is-a-fluffy-scottish-cat-from-moscow-with-many-fans&psig=AOvVaw26ZMWeUCgLDSdjs8zczWMX&ust=1584650100921000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCJD00OrvpOgCFQAAAAAdAAAAABAJ)
