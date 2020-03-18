@@ -24,18 +24,18 @@ The structure of the eau2 system is organized into three layers: application lay
 ### Application
 - due to lack of specific needs from the client, this is TBD
 ### KV-store
-- Key
-- fields: home node, unique identifier of a value on that value’s home node
+- Key:	
+	- fields: home node, unique identifier of a value on that value’s home node
 	- function: 
-- getNode() => node that this key resides on
+		- getNode() => node that this key resides on
 - Value: 
-- field: char * serialized_information (can be anything)
+	- field: char * serialized_information (can be anything)
 - KV classes: 
--field: Map * (maps keys to values)
--function:
-	- get(Key k) => Value, Gets a value from a KV-store based on the key
-	- getAndWait(Key k) => Value, Gets a value from a KV-store based on the key and waits for that key to exist
-	- put(Key k, Value v) => void, putting key-value pair into the KV-store
+	- field: Map * (maps keys to values)
+	- function:
+		- get(Key k) => Value, Gets a value from a KV-store based on the key
+		- getAndWait(Key k) => Value, Gets a value from a KV-store based on the key and waits for that key to exist
+		- put(Key k, Value v) => void, putting key-value pair into the KV-store
 ### Networking Layer (Nodes)
 - we plan to start to work on troubleshooting the previous networking assignments in preparation for this; API will is TBD
 
