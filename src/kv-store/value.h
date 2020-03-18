@@ -145,7 +145,7 @@ public:
             // adding a bool column
             if (col_types->at(i) == 'B')
             {
-                BoolColumn *bc_ = new BoolColumn();
+                Column *bc_ = new BoolColumn();
                 for (int i = 0; i < row; i++)
                 {
                     for (int j = current; j < bool_size; j++)
@@ -161,7 +161,7 @@ public:
             // adding an int column
             else if (col_types->at(i) == 'I')
             {
-                IntColumn *ic_ = new IntColumn();
+                Column *ic_ = new IntColumn();
                 current = decode_helper(ic_, current, int_size, row);
                 for (int i = 0; i < row; i++)
                 {
@@ -178,7 +178,7 @@ public:
             // adding a float column
             else if (col_types->at(i) == 'F')
             {
-                FloatColumn *fc_ = new FloatColumn();
+                Column *fc_ = new FloatColumn();
                 for (int i = 0; i < row; i++)
                 {
                     for (int j = current; j < float_size; j++)
@@ -194,7 +194,7 @@ public:
             // adding a String column
             else if (col_types->at(i) == 'S')
             {
-                StringColumn *sc_ = new StringColumn();
+                Column *sc_ = new StringColumn();
                 StrBuff sb_ = StrBuff();
                 for (int i = 0; i < row; i++)
                 {
