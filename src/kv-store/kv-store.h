@@ -101,6 +101,7 @@ public:
     Value *getAndWait(Key *key)
     {
         assert(key != nullptr);
+        return nullptr;
     }
 
     /**
