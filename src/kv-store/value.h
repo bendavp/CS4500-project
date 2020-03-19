@@ -29,12 +29,13 @@ public:
      */
     void encode(DataFrame *df)
     {
+        std::cout << "now im encoding\n";
         StrBuff builder = StrBuff();
 
         // adding num of columns then rows
         int col = df->ncols();
         int row = df->nrows();
-        builder.c(reinterpret_cast<char *>(col)).c(reinterpret_cast<char *>(row));
+        builder.c(reinterpret_cast<char *>(&col)).c(reinterpret_cast<char *>(&row));
 
         // adding the col-types into the encoded
         String *schema_coltypes = df->get_schema().coltypes_;
@@ -83,7 +84,6 @@ public:
 
         // creating the char* from the StrBuff
         String *encodedStr = builder.get();
-        char *serialized_ = new char[encodedStr->size()];
         serialized_ = encodedStr->steal();
 
         // deleting created objects
@@ -98,8 +98,9 @@ public:
      */
     DataFrame *decode()
     {
+        std::cout << "im decoding now\n";
         assert(serialized_ != nullptr);
-
+        std::cout << "im decoding now\n";
         // size_t encoded_size = strlen(serialized_); // make sure we don't go past how many bytes we serialized
         // assert(encoded_size != 0);
 
@@ -131,6 +132,8 @@ public:
         }
         int row = *reinterpret_cast<int *>(int_temp);
 
+        std::cout << "col and row are: " << col << " " << row << '\n';
+
         // getting the col types
         StrBuff sb_;
         for (int i = current; i < col; i++)
@@ -139,6 +142,8 @@ public:
             current++;
         }
         String *col_types = sb_.get();
+
+        std::cout << "here\n";
 
         Schema *scm = new Schema();
         DataFrame *decoded_ = new DataFrame(*scm); // empty dataframe that will be filled
