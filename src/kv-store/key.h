@@ -82,4 +82,4 @@ public:
         }
         name = key_.get();
     }
-}
+};

@@ -14,8 +14,7 @@ void testSerializingDeserializing()
     df->add_column(c3, nullptr);
     df->add_column(c4, nullptr);
 
-    String *s = df->gmap(StrGeneratorDF());
-    std::cout << s->c_str();
+    df->print();
 
     Value *v = new Value();
     v->encode(df);
@@ -23,10 +22,8 @@ void testSerializingDeserializing()
     std::cout << v->serialized_;
 
     DataFrame *df2 = v->decode(df2);
-    String *s2 = df->gmap(StrGeneratorDF());
-    std::cout << s2->c_str();
 
-    assert(s.equals(s2));
+    df2->print();
 }
 
 int main()

@@ -153,7 +153,7 @@ public:
                         bool_temp[j] = serialized_[j];
                         current++;
                     }
-                    bool *bool_temp_ = reinterpret<bool *>(bool_temp);
+                    bool *bool_temp_ = reinterpret_cast<bool *>(bool_temp);
                     bc_->push_back(*bool_temp_);
                 }
                 decoded_->add_column(bc_->clone(), nullptr);
