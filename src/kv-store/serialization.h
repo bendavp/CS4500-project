@@ -26,9 +26,9 @@ public:
         serialize_int((int)val, buffer);
     }
 
-    bool deserialize_bool(char *buffer)
+    bool deserialize_bool(char *bool_buffer)
     {
-        bool val = (bool)deserialize_int(buffer);
+        bool val = (bool)deserialize_int(bool_buffer);
         return val;
     }
 };
