@@ -35,11 +35,27 @@ void testSerializingDeserializing()
 int main()
 {
     Serialization s_ = Serialization();
+
     int n = 10;
     std::cout << n << '\n';
-    char *encoded = s_.serialize_int(n);
-    std::cout << encoded << '\n';
-    int decoded = s_.deserialize_int(encoded);
-    std::cout << decoded << '\n';
+    char *encoded = new char[4];
+    s_.serialize_int(n, encoded);
+    int decoded_i = s_.deserialize_int(encoded);
+    std::cout << decoded_i << '\n';
+
+    bool b = true;
+    std::cout << b << '\n';
+    char *encoded2 = new char[4];
+    s_.serialize_bool(b, encoded2);
+    bool decoded_b = s_.deserialize_bool(encoded2);
+    std::cout << decoded_b << '\n';
+
+    bool b2 = false;
+    std::cout << b2 << '\n';
+    char *encoded22 = new char[4];
+    s_.serialize_bool(b2, encoded22);
+    bool decoded_b2 = s_.deserialize_bool(encoded22);
+    std::cout << decoded_b2 << '\n';
+
     // testSerializingDeserializing();
 }
