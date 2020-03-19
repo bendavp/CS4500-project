@@ -44,14 +44,14 @@ public:
 
     size_t hash()
     {
-        return name->hash()
+        return name->hash();
     }
 
     char *encode()
     {
         // casting everything as a char array
         StrBuff encoded_ = StrBuff();
-        encoded_.c(reinterpret_cast<char *> home).c(name->c_str());
+        encoded_.c(reinterpret_cast<char *>(home)).c(name->c_str());
 
         // converting StrBuff to char*
         String *encodedStr = encoded_.get();
@@ -72,7 +72,7 @@ public:
         {
             sz_temp[i] = serialized[i];
         }
-        home = (size_t)sz_temp;
+        home = *reinterpret_cast<size_t *>(sz_temp);
 
         // deserializing the name/key value
         StrBuff key_ = StrBuff();

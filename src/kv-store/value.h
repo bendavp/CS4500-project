@@ -118,7 +118,7 @@ public:
             int_temp[i] = serialized_[i];
             current++;
         }
-        int col = (int)int_temp;
+        int col = *reinterpret_cast<int *>(int_temp);
 
         // getting the total num of rows
         for (int i = current; i < int_size; i++)
@@ -126,7 +126,7 @@ public:
             int_temp[i] = serialized_[i];
             current++;
         }
-        int row = (int)int_temp;
+        int row = *reinterpret_cast<int *>(int_temp);
 
         // getting the col types
         StrBuff sb_;
@@ -137,8 +137,8 @@ public:
         }
         String *col_types = sb_.get();
 
-        Schema scm = Schema();
-        DataFrame *decoded_ = new DataFrame(scm); // empty dataframe that will be filled
+        Schema *scm = new Schema();
+        DataFrame *decoded_ = new DataFrame(*scm); // empty dataframe that will be filled
 
         for (int i = 0; i < col; i++)
         {
@@ -156,7 +156,7 @@ public:
                     bool *bool_temp_ = reinterpret<bool *>(bool_temp);
                     bc_->push_back(*bool_temp_);
                 }
-                decoded_->add_column(bc_.clone(), nullptr);
+                decoded_->add_column(bc_->clone(), nullptr);
                 delete bc_;
             }
             // adding an int column
@@ -173,7 +173,7 @@ public:
                     int *int_temp_ = reinterpret_cast<int *>(int_temp);
                     ic_->push_back(*int_temp_);
                 }
-                decoded_->add_column(ic_.clone(), nullptr);
+                decoded_->add_column(ic_->clone(), nullptr);
                 delete ic_;
             }
             // adding a float column
@@ -190,7 +190,7 @@ public:
                     double *float_temp_ = reinterpret_cast<double *>(float_temp);
                     fc_->push_back((float)*float_temp_);
                 }
-                decoded_->add_column(fc_.clone(), nullptr);
+                decoded_->add_column(fc_->clone(), nullptr);
                 delete fc_;
             }
             // adding a String column
@@ -209,7 +209,7 @@ public:
                     }
                     sc_->push_back(sb_.get());
                 }
-                decoded_->add_column(sc_);
+                decoded_->add_column(sc_->clone(), nullptr);
                 delete sc_;
             }
         }
@@ -230,4 +230,4 @@ public:
     {
         return String(serialized_).hash();
     }
-}
+};
