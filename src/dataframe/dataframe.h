@@ -624,6 +624,28 @@ public:
         }
     }
 
+    /**
+     * @brief For testing to see if DataFrames are equal (via checking if outputted strings are the same/as expected)
+     * 
+     * @param r - type of rower to use (use the StrGeneratorDF)
+     * @return String* 
+     */
+    String *gmap(Rower &r)
+    {
+        Row row_ = Row(get_schema());
+        StrBuff sb_ = StrBuff();
+        for (size_t i = 0; i < nrows_; i++)
+        {
+            String *temp;
+            fill_row(i, row_);
+            r.accept(row_);
+            temp = r.s->c_str();
+            sb_.c(temp->steal());
+            delete temp;
+        }
+        return sb_.get();
+    }
+
     /** This method clones the Rower and executes the map in parallel. Join is
     * used at the end to merge the results. */
     void pmap(Rower &r)

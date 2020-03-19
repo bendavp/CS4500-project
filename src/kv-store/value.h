@@ -49,7 +49,7 @@ public:
             {
                 for (int j = 0; j < row; j++)
                 {
-                    builder.c(reinterpret_cast<char *>(df->get_bool(i, j)));
+                    builder.c(reinterpret_cast<char *>(&df->get_bool(i, j)));
                 }
             }
             // ints
@@ -57,15 +57,15 @@ public:
             {
                 for (int j = 0; j < row; j++)
                 {
-                    builder.c(reinterpret_cast<char *>(df->get_int(i, j)));
+                    builder.c(reinterpret_cast<char *>(&df->get_int(i, j)));
                 }
             }
-            // floats (casted into a long first due to inability to just cast float into char*)
+            // floats (casted into a double first due to inability to just cast float into char*)
             else if (schema_coltypes->at(i) == 'F')
             {
                 for (int j = 0; j < row; j++)
                 {
-                    builder.c(reinterpret_cast<char *>((long)df->get_float(i, j)));
+                    builder.c(reinterpret_cast<char *>(&(double)df->get_float(i, j)));
                 }
             }
             // strings
@@ -103,7 +103,7 @@ public:
         // size of the different primitives when encoded
         size_t int_size = sizeof(int);
         size_t bool_size = sizeof(bool);
-        size_t float_size = sizeof(long);
+        size_t float_size = sizeof(double);
 
         // creating temp char array to hold info before deserializing
         char *int_temp = new char[int_size];
@@ -153,7 +153,8 @@ public:
                         bool_temp[j] = serialized_[j];
                         current++;
                     }
-                    bc_->push_back((bool)bool_temp);
+                    bool *bool_temp_ = reinterpret<bool *>(bool_temp);
+                    bc_->push_back(*bool_temp_);
                 }
                 decoded_->add_column(bc_.clone(), nullptr);
                 delete bc_;
@@ -162,7 +163,6 @@ public:
             else if (col_types->at(i) == 'I')
             {
                 Column *ic_ = new IntColumn();
-                current = decode_helper(ic_, current, int_size, row);
                 for (int i = 0; i < row; i++)
                 {
                     for (int j = current; j < int_size; j++)
@@ -170,7 +170,8 @@ public:
                         int_temp[j] = serialized_[j];
                         current++;
                     }
-                    ic_->push_back((int)int_temp);
+                    int *int_temp_ = reinterpret_cast<int *>(int_temp);
+                    ic_->push_back(*int_temp_);
                 }
                 decoded_->add_column(ic_.clone(), nullptr);
                 delete ic_;
@@ -186,7 +187,8 @@ public:
                         float_temp[j] = serialized_[j];
                         current++;
                     }
-                    fc_->push_back((float)float_temp);
+                    double *float_temp_ = reinterpret_cast<double *>(float_temp);
+                    fc_->push_back((float)*float_temp_);
                 }
                 decoded_->add_column(fc_.clone(), nullptr);
                 delete fc_;
@@ -207,6 +209,8 @@ public:
                     }
                     sc_->push_back(sb_.get());
                 }
+                decoded_->add_column(sc_);
+                delete sc_;
             }
         }
         delete col_types;

@@ -106,7 +106,7 @@ public:
     /**
    * Set the value at the given key in this map.
    */
-    void add(Key *key, Value *value)
+    void put(Key *key, Value *value)
     {
         assert(key != nullptr);
         assert(value != nullptr);

@@ -178,3 +178,89 @@ public:
         return new AddAllInts();
     }
 };
+
+/**
+ * @brief per each row/field, adds the data inside to a StrBuff
+ * 
+ */
+class StrGeneratorLn : public Fielder
+{
+public:
+    int row_num;
+    StrBuff sb_ = StrBuff();
+    /** Called before visiting a row, the argument is the row offset in the
+    dataframe. */
+    void start(size_t r)
+    {
+        row_num = r;
+    }
+
+    /** Called for fields of the argument's type with the value of the field. */
+    void accept(bool b)
+    {
+        sb_.c(b).c('\t');
+    }
+
+    void accept(float f)
+    {
+        sb_.c(f).c('\t');
+    }
+
+    void accept(int i)
+    {
+        sb_.c(i).c('\t');
+    }
+
+    void accept(String *s)
+    {
+        sb_.c(s->c_str).c('\t');
+    }
+
+    /** Called when all fields have been seen. */
+    virtual void done()
+    {
+        sb_ = StrBuff();
+    }
+};
+
+/**
+ * @brief Generates a string-representation of a DataFrame
+ * 
+ */
+class StrGeneratorDF : public Rower
+{
+public:
+    StrBuff sb_ = StrBuff();
+    String *s;
+    size_t total_rows = 0;
+
+    bool accept(Row &r)
+    {
+        StrGeneratorLn strgenln_ = StrGeneratorLn();
+        strgenln_.start(r.get_idx());
+        r.visit(r.get_idx(), strgenln_);
+        sb_.c(strgenln_.current.get()->c_str()).c('\n');
+        strgenlen_.done();
+        total_rows = total_rows + 1;
+        s = sb_.get();
+        return true;
+    }
+
+    void join_delete(Rower *other)
+    {
+        StrGeneratorLn *r = static_cast<StrGeneratorLn *>(other);
+        sb_.c(r->sb_.get().c_str());
+        total_rows += total_rows + r->total_rows;
+        delete other;
+    }
+
+    void reset()
+    {
+        total_rows = 0;
+        delete sb_.get();
+    }
+
+    Rower *clone()
+    {
+        return new StrGeneratorDF();
+    }
