@@ -49,7 +49,8 @@ public:
             {
                 for (int j = 0; j < row; j++)
                 {
-                    builder.c(reinterpret_cast<char *>(&df->get_bool(i, j)));
+                    bool b_ = df->get_bool(i, j);
+                    builder.c(reinterpret_cast<char *>(&b_));
                 }
             }
             // ints
@@ -57,7 +58,8 @@ public:
             {
                 for (int j = 0; j < row; j++)
                 {
-                    builder.c(reinterpret_cast<char *>(&df->get_int(i, j)));
+                    int i_ = df->get_int(i, j);
+                    builder.c(reinterpret_cast<char *>(&i_));
                 }
             }
             // floats (casted into a double first due to inability to just cast float into char*)
@@ -65,7 +67,8 @@ public:
             {
                 for (int j = 0; j < row; j++)
                 {
-                    builder.c(reinterpret_cast<char *>(&(double)df->get_float(i, j)));
+                    double f_ = (double)df->get_float(i, j);
+                    builder.c(reinterpret_cast<char *>(&f_);
                 }
             }
             // strings

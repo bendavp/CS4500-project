@@ -1,5 +1,4 @@
 #include "../src/kv-store/kv-store.h"
-#include "../src/utils/rower.h"
 
 void testSerializingDeserializing()
 {
@@ -21,7 +20,7 @@ void testSerializingDeserializing()
 
     std::cout << v->serialized_;
 
-    DataFrame *df2 = v->decode(df2);
+    DataFrame *df2 = v->decode();
 
     df2->print();
 }
@@ -30,9 +29,3 @@ int main()
 {
     testSerializingDeserializing();
 }
-
-// serialize
-
-// deserialize
-
-// before serialization == after serialization AND deserialization

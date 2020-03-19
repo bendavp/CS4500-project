@@ -32,7 +32,10 @@ public:
         home = h;
     }
 
-    Key(char *serialized) : decode(serialized) {}
+    Key(char *serialized) : Object()
+    {
+        decode(serialized)
+    }
 
     bool equals(Object *other)
     {
