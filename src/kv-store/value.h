@@ -68,7 +68,7 @@ public:
                 for (int j = 0; j < row; j++)
                 {
                     double f_ = (double)df->get_float(i, j);
-                    builder.c(reinterpret_cast<char *>(&f_);
+                    builder.c(reinterpret_cast<char *>(&f_));
                 }
             }
             // strings

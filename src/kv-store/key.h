@@ -34,7 +34,7 @@ public:
 
     Key(char *serialized) : Object()
     {
-        decode(serialized)
+        decode(serialized);
     }
 
     bool equals(Object *other)
