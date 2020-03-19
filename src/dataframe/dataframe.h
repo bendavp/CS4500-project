@@ -423,7 +423,14 @@ public:
             }
         }
         col_arr_->push_back(col->clone());
-        schema_->add_column(col->get_type(), name->clone());
+        if (name == nullptr)
+        {
+            schema_->add_column(col->get_type(), nullptr);
+        }
+        else
+        {
+            schema_->add_column(col->get_type(), name->clone());
+        }
         ncols_ = ncols_ + 1; // update ncol size
     }
 
