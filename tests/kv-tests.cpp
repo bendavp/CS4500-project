@@ -1,4 +1,5 @@
 #include "../src/kv-store/kv-store.h"
+#include "../src/kv-store/serialization.h"
 
 void testSerializingDeserializing()
 {
@@ -33,5 +34,12 @@ void testSerializingDeserializing()
 
 int main()
 {
-    testSerializingDeserializing();
+    Serialization s_ = Serialization();
+    int n = 10;
+    std::cout << n << '\n';
+    char *encoded = s_.serialize_int(n);
+    std::cout << encoded << '\n';
+    int decoded = s_.deserialize_int(encoded);
+    std::cout << decoded << '\n';
+    // testSerializingDeserializing();
 }
