@@ -29,13 +29,21 @@ public:
      */
     void encode(DataFrame *df)
     {
-        std::cout << "now im encoding\n";
+        Serializer serializer_ = Serializer();
         StrBuff builder = StrBuff();
 
-        // adding num of columns then rows
+        // adding num of columns
         int col = df->ncols();
+        char *buffer = new char[4];
+        serializer_.serialize_int(col, buffer);
+        builder.c(buffer);
+        delete buffer;
+        // adding num of rows
         int row = df->nrows();
-        builder.c(reinterpret_cast<char *>(&col)).c(reinterpret_cast<char *>(&row));
+        buffer = new char[4];
+        serializer_.serialize_int(row, buffer);
+        builder.c(buffer);
+        delete buffer;
 
         // adding the col-types into the encoded
         String *schema_coltypes = df->get_schema().coltypes_;
@@ -51,7 +59,10 @@ public:
                 for (int j = 0; j < row; j++)
                 {
                     bool b_ = df->get_bool(i, j);
-                    builder.c(reinterpret_cast<char *>(&b_));
+                    buffer = new char[4];
+                    serializer_.serialize_bool(b_, buffer);
+                    builder.c(buffer);
+                    delete buffer;
                 }
             }
             // ints
@@ -60,7 +71,10 @@ public:
                 for (int j = 0; j < row; j++)
                 {
                     int i_ = df->get_int(i, j);
-                    builder.c(reinterpret_cast<char *>(&i_));
+                    buffer = new char[4];
+                    serializer_.serialize_int(i_, buffer);
+                    builder.c(buffer);
+                    delete buffer;
                 }
             }
             // floats (casted into a double first due to inability to just cast float into char*)
@@ -68,8 +82,11 @@ public:
             {
                 for (int j = 0; j < row; j++)
                 {
-                    double f_ = (double)df->get_float(i, j);
-                    builder.c(reinterpret_cast<char *>(&f_));
+                    float f_ = df->get_float(i, j);
+                    buffer = new char[4];
+                    serializer_.serialize_float(f_, buffer);
+                    builder.c(buffer);
+                    delete buffer;
                 }
             }
             // strings
@@ -98,6 +115,7 @@ public:
      */
     DataFrame *decode()
     {
+        Serializer serializer_ = Serializer();
         std::cout << "im decoding now\n";
         assert(serialized_ != nullptr);
         std::cout << "im decoding now\n";
@@ -105,8 +123,8 @@ public:
         // assert(encoded_size != 0);
 
         // size of the different primitives when encoded
-        size_t int_size = sizeof(int);
-        size_t bool_size = sizeof(bool);
+        size_t int_size = 4;
+        size_t bool_size = 4;
         size_t float_size = sizeof(double);
 
         // creating temp char array to hold info before deserializing
@@ -122,7 +140,7 @@ public:
             int_temp[i] = serialized_[i];
             current++;
         }
-        int col = *reinterpret_cast<int *>(int_temp);
+        int col = serializer_.deserialize_int(int_temp);
 
         // getting the total num of rows
         for (int i = current; i < int_size; i++)
@@ -130,7 +148,7 @@ public:
             int_temp[i] = serialized_[i];
             current++;
         }
-        int row = *reinterpret_cast<int *>(int_temp);
+        int row = serializer_.deserialize_int(int_temp);
 
         std::cout << "col and row are: " << col << " " << row << '\n';
 
@@ -161,8 +179,8 @@ public:
                         bool_temp[j] = serialized_[j];
                         current++;
                     }
-                    bool *bool_temp_ = reinterpret_cast<bool *>(bool_temp);
-                    bc_->push_back(*bool_temp_);
+                    bool b_ = serializer_.deserialize_bool(bool_temp);
+                    bc_->push_back(b_);
                 }
                 decoded_->add_column(bc_->clone(), nullptr);
                 delete bc_;
@@ -178,8 +196,8 @@ public:
                         int_temp[j] = serialized_[j];
                         current++;
                     }
-                    int *int_temp_ = reinterpret_cast<int *>(int_temp);
-                    ic_->push_back(*int_temp_);
+                    int i_ = serializer_.deserialize_int(int_temp);
+                    ic_->push_back(i_);
                 }
                 decoded_->add_column(ic_->clone(), nullptr);
                 delete ic_;
@@ -195,8 +213,8 @@ public:
                         float_temp[j] = serialized_[j];
                         current++;
                     }
-                    double *float_temp_ = reinterpret_cast<double *>(float_temp);
-                    fc_->push_back((float)*float_temp_);
+                    float f_ = serializer_.deserialize_float(float_temp);
+                    fc_->push_back(f_);
                 }
                 decoded_->add_column(fc_->clone(), nullptr);
                 delete fc_;
