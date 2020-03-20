@@ -97,7 +97,8 @@ public:
             {
                 for (int j = 0; j < row; j++)
                 {
-                    builder.c(df->get_string(i, j)->c_str()).c(sep);
+                    String *s_temp = df->get_string(i, j);
+                    builder.c(s_temp->c_str(), s_temp->size()).c(sep);
                 }
             }
         }
@@ -246,6 +247,7 @@ public:
                         current++;
                         j++;
                     }
+                    current++;
                     sc_->push_back(sb_.get());
                 }
                 decoded_->add_column(sc_->clone(), nullptr);
