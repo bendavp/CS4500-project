@@ -8,19 +8,13 @@ public:
 
     void serialize_int(int val, char *buffer)
     {
-        buffer[0] = (val & 0xff000000) >> 24;
-        buffer[1] = (val & 0x00ff0000) >> 16;
-        buffer[2] = (val & 0x0000ff00) >> 8;
-        buffer[3] = (val & 0x000000ff);
+        memcpy(buffer, &val, sizeof(int));
     }
 
     int deserialize_int(char *int_buffer)
     {
-        int val = 0;
-        val |= ((int)int_buffer[0]) << 24;
-        val |= ((int)int_buffer[1]) << 16;
-        val |= ((int)int_buffer[2]) << 8;
-        val |= ((int)int_buffer[3]);
+        int val;
+        memcpy(&val, int_buffer, sizeof(int));
         return val;
     }
 
@@ -37,19 +31,13 @@ public:
 
     void serialize_float(float val, char *buffer)
     {
-        buffer[0] = ((long)val & 0xff000000) >> 24;
-        buffer[1] = ((long)val & 0x00ff0000) >> 16;
-        buffer[2] = ((long)val & 0x0000ff00) >> 8;
-        buffer[3] = ((long)val & 0x000000ff);
+        memcpy(buffer, &val, sizeof(float));
     }
 
     float deserialize_float(char *float_buffer)
     {
-        long val = 0;
-        val |= ((long)float_buffer[0]) << 24;
-        val |= ((long)float_buffer[1]) << 16;
-        val |= ((long)float_buffer[2]) << 8;
-        val |= ((long)float_buffer[3]);
-        return (float)val;
+        float val;
+        memcpy(&val, buffer, sizeof(float));
+        return val;
     }
 };
