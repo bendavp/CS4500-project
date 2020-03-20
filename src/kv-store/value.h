@@ -1,4 +1,5 @@
 #include "../dataframe/dataframe.h"
+#include "serializer.h"
 
 #pragma once
 
@@ -37,13 +38,13 @@ public:
         char *buffer = new char[4];
         serializer_.serialize_int(col, buffer);
         builder.c(buffer);
-        delete buffer;
+        delete[] buffer;
         // adding num of rows
         int row = df->nrows();
         buffer = new char[4];
         serializer_.serialize_int(row, buffer);
         builder.c(buffer);
-        delete buffer;
+        delete[] buffer;
 
         // adding the col-types into the encoded
         String *schema_coltypes = df->get_schema().coltypes_;
@@ -59,10 +60,10 @@ public:
                 for (int j = 0; j < row; j++)
                 {
                     bool b_ = df->get_bool(i, j);
-                    buffer = new char[4];
+                    char *buffer = new char[4];
                     serializer_.serialize_bool(b_, buffer);
                     builder.c(buffer);
-                    delete buffer;
+                    delete[] buffer;
                 }
             }
             // ints
@@ -71,10 +72,10 @@ public:
                 for (int j = 0; j < row; j++)
                 {
                     int i_ = df->get_int(i, j);
-                    buffer = new char[4];
+                    char *buffer = new char[4];
                     serializer_.serialize_int(i_, buffer);
                     builder.c(buffer);
-                    delete buffer;
+                    delete[] buffer;
                 }
             }
             // floats (casted into a double first due to inability to just cast float into char*)
@@ -83,10 +84,10 @@ public:
                 for (int j = 0; j < row; j++)
                 {
                     float f_ = df->get_float(i, j);
-                    buffer = new char[4];
+                    char *buffer = new char[4];
                     serializer_.serialize_float(f_, buffer);
                     builder.c(buffer);
-                    delete buffer;
+                    delete[] buffer;
                 }
             }
             // strings
