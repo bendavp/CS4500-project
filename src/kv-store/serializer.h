@@ -1,4 +1,4 @@
-
+#include <string.h>
 // based of our understanding from link below:
 // http://www.cplusplus.com/forum/general/201675/
 class Serializer
@@ -37,7 +37,7 @@ public:
     float deserialize_float(char *float_buffer)
     {
         float val;
-        memcpy(&val, buffer, sizeof(float));
+        memcpy(&val, float_buffer, sizeof(float));
         return val;
     }
 };
