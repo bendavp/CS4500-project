@@ -1,5 +1,5 @@
 #include "../src/kv-store/kv-store.h"
-#include "../src/kv-store/serialization.h"
+#include "../src/kv-store/serializer.h"
 
 void testSerializingDeserializing()
 {
@@ -34,7 +34,7 @@ void testSerializingDeserializing()
 
 int main()
 {
-    Serialization s_ = Serialization();
+    Serializer s_ = Serializer();
 
     int n = 10;
     std::cout << n << '\n';
@@ -57,5 +57,11 @@ int main()
     bool decoded_b2 = s_.deserialize_bool(encoded22);
     std::cout << decoded_b2 << '\n';
 
+    float f = 1.22;
+    std::cout << n << '\n';
+    char *encoded3 = new char[4];
+    s_.serialize_float(f, encoded3);
+    float decoded_f = s_.deserialize_int(encoded3);
+    std::cout << decoded_f << '\n';
     // testSerializingDeserializing();
 }
