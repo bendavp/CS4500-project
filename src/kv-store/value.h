@@ -35,15 +35,17 @@ public:
 
         // adding num of columns
         int col = df->ncols();
-        char *buffer = new char[4];
+        std::cout << col << std::endl;
+        char *buffer = new char[sizeof(int)];
         serializer_.serialize_int(col, buffer);
-        builder.c(buffer);
+        builder.c(buffer, sizeof(int));
         delete[] buffer;
         // adding num of rows
         int row = df->nrows();
-        buffer = new char[4];
+        std::cout << row << std::endl;
+        buffer = new char[sizeof(int)];
         serializer_.serialize_int(row, buffer);
-        builder.c(buffer);
+        builder.c(buffer, sizeof(int));
         delete[] buffer;
 
         // adding the col-types into the encoded
@@ -60,9 +62,9 @@ public:
                 for (int j = 0; j < row; j++)
                 {
                     bool b_ = df->get_bool(i, j);
-                    char *buffer = new char[4];
+                    char *buffer = new char[sizeof(int)];
                     serializer_.serialize_bool(b_, buffer);
-                    builder.c(buffer);
+                    builder.c(buffer, sizeof(int));
                     delete[] buffer;
                 }
             }
@@ -72,9 +74,9 @@ public:
                 for (int j = 0; j < row; j++)
                 {
                     int i_ = df->get_int(i, j);
-                    char *buffer = new char[4];
+                    char *buffer = new char[sizeof(int)];
                     serializer_.serialize_int(i_, buffer);
-                    builder.c(buffer);
+                    builder.c(buffer, sizeof(int));
                     delete[] buffer;
                 }
             }
@@ -84,9 +86,9 @@ public:
                 for (int j = 0; j < row; j++)
                 {
                     float f_ = df->get_float(i, j);
-                    char *buffer = new char[4];
+                    char *buffer = new char[sizeof(float)];
                     serializer_.serialize_float(f_, buffer);
-                    builder.c(buffer);
+                    builder.c(buffer, sizeof(float));
                     delete[] buffer;
                 }
             }
@@ -124,17 +126,15 @@ public:
         // assert(encoded_size != 0);
 
         // size of the different primitives when encoded
-        size_t int_size = 4;
-        size_t bool_size = 4;
-        size_t float_size = sizeof(double);
-
+        size_t int_size = sizeof(int);
+        size_t bool_size = sizeof(int);
+        size_t float_size = sizeof(float);
         // creating temp char array to hold info before deserializing
         char *int_temp = new char[int_size];
         char *bool_temp = new char[bool_size];
         char *float_temp = new char[float_size];
 
         size_t current = 0; // keep track of how far along we have moved
-
         // getting the total num of columns
         for (int i = current; i < int_size; i++)
         {
@@ -142,11 +142,14 @@ public:
             current++;
         }
         int col = serializer_.deserialize_int(int_temp);
+        delete[] int_temp;
+        int_temp = new char[int_size];
 
         // getting the total num of rows
-        for (int i = current; i < int_size; i++)
+        int current2 = current;
+        for (int i = current2; i < current2 + int_size; i++)
         {
-            int_temp[i] = serialized_[i];
+            int_temp[i - current2] = serialized_[i];
             current++;
         }
         int row = serializer_.deserialize_int(int_temp);
@@ -154,13 +157,18 @@ public:
         std::cout << "col and row are: " << col << " " << row << '\n';
 
         // getting the col types
-        StrBuff sb_;
-        for (int i = current; i < col; i++)
+        // StrBuff sb_;
+        char *ct_ = new char[col];
+        current2 = current;
+        for (int i = current2; i < current2 + col; i++)
         {
-            sb_.c(i);
+            // sb_.c(serialized_[i]);
+            ct_[i - current2] = serialized_[i];
             current++;
         }
-        String *col_types = sb_.get();
+        // String *col_types = sb_.get();
+        String *col_types = new String(ct_);
+        std::cout << "col types here " << col_types->c_str() << '\n';
 
         std::cout << "here\n";
 
@@ -175,9 +183,10 @@ public:
                 Column *bc_ = new BoolColumn();
                 for (int i = 0; i < row; i++)
                 {
-                    for (int j = current; j < bool_size; j++)
+                    current2 = current;
+                    for (int j = current2; j < current2 + bool_size; j++)
                     {
-                        bool_temp[j] = serialized_[j];
+                        bool_temp[j - current2] = serialized_[j];
                         current++;
                     }
                     bool b_ = serializer_.deserialize_bool(bool_temp);
@@ -192,9 +201,10 @@ public:
                 Column *ic_ = new IntColumn();
                 for (int i = 0; i < row; i++)
                 {
-                    for (int j = current; j < int_size; j++)
+                    current2 = current;
+                    for (int j = current2; j < current2 + int_size; j++)
                     {
-                        int_temp[j] = serialized_[j];
+                        int_temp[j - current2] = serialized_[j];
                         current++;
                     }
                     int i_ = serializer_.deserialize_int(int_temp);
@@ -209,9 +219,10 @@ public:
                 Column *fc_ = new FloatColumn();
                 for (int i = 0; i < row; i++)
                 {
-                    for (int j = current; j < float_size; j++)
+                    current2 = current;
+                    for (int j = current2; j < current2 + float_size; j++)
                     {
-                        float_temp[j] = serialized_[j];
+                        float_temp[j - current2] = serialized_[j];
                         current++;
                     }
                     float f_ = serializer_.deserialize_float(float_temp);
@@ -230,6 +241,7 @@ public:
                     int j = current;
                     while (serialized_[j] != sep)
                     {
+                        std::cout << serialized_[j] << '\n';
                         sb_.c(serialized_[j]);
                         current++;
                         j++;

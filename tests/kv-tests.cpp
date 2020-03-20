@@ -63,5 +63,5 @@ int main()
     s_.serialize_float(f, encoded3);
     float decoded_f = s_.deserialize_float(encoded3);
     std::cout << decoded_f << '\n';
-    // testSerializingDeserializing();
+    testSerializingDeserializing();
 }
