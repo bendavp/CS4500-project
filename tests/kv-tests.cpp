@@ -58,7 +58,7 @@ int main()
     std::cout << decoded_b2 << '\n';
 
     float f = 1.22;
-    std::cout << n << '\n';
+    std::cout << f << '\n';
     char *encoded3 = new char[4];
     s_.serialize_float(f, encoded3);
     float decoded_f = s_.deserialize_int(encoded3);
