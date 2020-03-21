@@ -328,9 +328,13 @@ void testSimpleDataFrameIBFS()
     df->add_column(c2, nullptr);
     df->add_column(c3, nullptr);
     df->add_column(c4, nullptr);
+<<<<<<< HEAD
     // printing original DataFrame
+=======
+    std::cout << "printing df now" << std::endl;
+>>>>>>> 6a3c7c5ca6bd0f2efa9263ed408a9c6135ca034c
     df->print();
-
+    std::cout << "finished printing df here" << std::endl;
     Value *v = new Value();
     v->encode(df);
 
@@ -358,11 +362,15 @@ void testSimpleDataFrameIBFSBS()
     // printing original DataFrame
     df->print();
 
+<<<<<<< HEAD
     Value *v = new Value();
     v->encode(df);
 
     DataFrame *df2 = v->decode();
     // printing deserialized DataFrame
+=======
+    std::cout << "printing df2 now" << std::endl;
+>>>>>>> 6a3c7c5ca6bd0f2efa9263ed408a9c6135ca034c
     df2->print();
 }
 
@@ -385,5 +393,37 @@ int main()
 
     testSimpleDataFrameIBFS();
 
+<<<<<<< HEAD
     std::cout << "All tests passed!" << std::endl;
+=======
+    float f = 3.402823466 * pow(10, 38);
+    std::cout << f << '\n';
+    char *encoded3 = new char[4];
+    s_.serialize_float(f, encoded3);
+    float decoded_f = s_.deserialize_float(encoded3);
+    std::cout << decoded_f << '\n';
+
+    testSerializingDeserializing();
+
+    size_t sz = 5;
+    String **strArray = new String *[sz];
+    strArray[0] = new String("hello");
+    strArray[1] = new String("world");
+    strArray[2] = new String("please");
+    strArray[3] = new String("pass");
+    strArray[4] = new String("me");
+    size_t buff_sz = 0;
+    for (int i = 0; i < sz; i++)
+    {
+        std::cout << strArray[i]->c_str() << ", ";
+        buff_sz += strArray[i]->size() + 1;
+    }
+    char *encoded4 = new char[buff_sz];
+    s_.serialize_StringArray(strArray, encoded4, sz);
+    String **strArray2 = s_.deserialize_StringArray(encoded4, sz);
+    for (int i = 0; i < sz; i++)
+    {
+        std::cout << strArray2[i]->c_str() << ", ";
+    }
+>>>>>>> 6a3c7c5ca6bd0f2efa9263ed408a9c6135ca034c
 }
