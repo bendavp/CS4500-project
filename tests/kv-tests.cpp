@@ -3,32 +3,25 @@
 
 void testSerializingDeserializing()
 {
-    std::cout << "hello you piece of shit\n";
     Schema *s = new Schema();
     DataFrame *df = new DataFrame(*s);
-    std::cout << "success ln 8\n";
     Column *c1 = new IntColumn(8, 1, 2, 3, 4, 5, 6, 7, 8);
     Column *c2 = new BoolColumn(8, true, false, true, false, true, false, true, false);
-    std::cout << "success ln 11\n";
     Column *c3 = new FloatColumn(8, 1.22, 2.22, 3.22, 4.22, 5.22, 6.22, 7.22, 8.22);
     Column *c4 = new StringColumn(8, new String("h"), new String("e"), new String("l"), new String("l"), new String("o"), new String("w"), new String("o"), new String("r"));
-    std::cout << "success ln 14\n";
     df->add_column(c1, nullptr);
-    std::cout << "what\n";
     df->add_column(c2, nullptr);
-    std::cout << "success added c1 c2\n";
     df->add_column(c3, nullptr);
     df->add_column(c4, nullptr);
-    std::cout << "success added c3 c4\n";
+    std::cout << "printing df now" << std::endl;
     df->print();
-
+    std::cout << "finished printing df here" << std::endl;
     Value *v = new Value();
     v->encode(df);
 
-    std::cout << v->serialized_;
-
     DataFrame *df2 = v->decode();
 
+    std::cout << "printing df2 now" << std::endl;
     df2->print();
 }
 
@@ -63,5 +56,27 @@ int main()
     s_.serialize_float(f, encoded3);
     float decoded_f = s_.deserialize_float(encoded3);
     std::cout << decoded_f << '\n';
+
     testSerializingDeserializing();
+
+    size_t sz = 5;
+    String **strArray = new String *[sz];
+    strArray[0] = new String("hello");
+    strArray[1] = new String("world");
+    strArray[2] = new String("please");
+    strArray[3] = new String("pass");
+    strArray[4] = new String("me");
+    size_t buff_sz = 0;
+    for (int i = 0; i < sz; i++)
+    {
+        std::cout << strArray[i]->c_str() << ", ";
+        buff_sz += strArray[i]->size() + 1;
+    }
+    char *encoded4 = new char[buff_sz];
+    s_.serialize_StringArray(strArray, encoded4, sz);
+    String **strArray2 = s_.deserialize_StringArray(encoded4, sz);
+    for (int i = 0; i < sz; i++)
+    {
+        std::cout << strArray2[i]->c_str() << ", ";
+    }
 }

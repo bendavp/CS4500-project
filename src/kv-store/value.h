@@ -95,10 +95,17 @@ public:
             // strings
             else if (schema_coltypes->at(i) == 'S')
             {
+                String *s_temp;
+                char *buffer;
+                char *sep_ = new char[1];
+                sep_[0] = sep;
                 for (int j = 0; j < row; j++)
                 {
-                    String *s_temp = df->get_string(i, j);
-                    builder.c(s_temp->c_str(), s_temp->size()).c(sep);
+                    s_temp = df->get_string(i, j);
+                    size_t s_sz = s_temp->size();
+                    buffer = new char[s_sz];
+                    serializer_.serialize_String(s_temp, buffer);
+                    builder.c(buffer, s_sz).c(sep_, 1);
                 }
             }
         }
@@ -191,6 +198,7 @@ public:
                         current++;
                     }
                     bool b_ = serializer_.deserialize_bool(bool_temp);
+                    std::cout << b_ << std::endl;
                     bc_->push_back(b_);
                 }
                 decoded_->add_column(bc_->clone(), nullptr);
@@ -236,18 +244,19 @@ public:
             else if (col_types->at(i) == 'S')
             {
                 Column *sc_ = new StringColumn();
-                StrBuff sb_ = StrBuff();
+                StrBuff sb_;
+                char *toAdd = new char[1];
                 for (int i = 0; i < row; i++)
                 {
+                    sb_ = StrBuff();
                     int j = current;
                     while (serialized_[j] != sep)
                     {
-                        std::cout << serialized_[j] << '\n';
-                        sb_.c(serialized_[j]);
-                        current++;
+                        toAdd[0] = serialized_[j];
+                        sb_.c(toAdd, 1);
                         j++;
                     }
-                    current++;
+                    current = j + 1;
                     sc_->push_back(sb_.get());
                 }
                 decoded_->add_column(sc_->clone(), nullptr);
