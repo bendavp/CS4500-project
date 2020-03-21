@@ -23,8 +23,6 @@ void test_get()
     Key *wrongKey1 = new Key(2);
     Key *wrongKey2 = new Key(new String("wrong"));
     Key *wrongKey3 = new Key(new String("wrong"), 2);
-    Schema *scm = new Schema();
-    Value *wrongValue = new Value(new DataFrame(*scm));
 
     Value *result1 = map->get(wrongKey1);
     Value *result2 = map->get(wrongKey2);
@@ -116,7 +114,7 @@ void test_keys()
 
     Key *key1 = new Key();
     Value *val1 = new Value();
-    Key *key2 = new Key("2");
+    Key *key2 = new Key(new String("2"));
     Schema *scm = new Schema();
     Value *val2 = new Value(new DataFrame(*scm));
 

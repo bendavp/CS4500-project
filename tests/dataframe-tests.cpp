@@ -385,7 +385,7 @@ void testAcceptNonemptyRow()
     Row *r_ = new Row(df->get_schema());
     for (size_t i = 0; i < df->nrows(); i++)
     {
-        Row *r_ = new Row(df->get_schema());
+        r_ = new Row(df->get_schema());
         df->fill_row(i, *r_);
         assert(printer_.accept(*r_));
         delete r_;
@@ -1431,7 +1431,7 @@ void testSet5()
 }
 
 /**
- * @brief Runs all Google Tests in this file
+ * @brief Runs all Tests in this file
  */
 int main(int argc, char **argv)
 {
