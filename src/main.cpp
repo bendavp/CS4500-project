@@ -2,9 +2,9 @@
 #include <string>
 #include <vector>
 
-#include "adapter/OptParser.hh"
-#include "adapter/SoRParser.hh"
-#include "adapter/StrConverter.hh"
+#include "adapter/OptParser.h"
+#include "adapter/SoRParser.h"
+#include "adapter/StrConverter.h"
 #include "dataframe/dataframe.h"
 
 void badArgError(const std::string &arg)

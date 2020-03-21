@@ -1,4 +1,5 @@
 #include "../src/dataframe/dataframe.h"
+#include <assert.h>
 
 /********************************************************************************************************************
  * testing FastArray
@@ -58,7 +59,6 @@ void testGet()
     assert(s->get(0)->equals(new String("hello")));
     assert(s->get(1)->equals(new String("world")));
 }
-
 
 /**
  * @brief Tests the set() function in all FastArrays
@@ -175,7 +175,7 @@ void testAddEmptyNameColumn()
     s->add_column('S', nullptr);
     String *s_str_new = new String("FIBSS");
 
-    assert(s->width()=5);
+    assert(s->width() == 5);
     assert(s->coltypes_->equals(s_str_new));
     assert(s->col_name(4) == nullptr);
 }
@@ -191,10 +191,9 @@ void testAddColToEmptySchemaNoName()
 
     s->add_column('S', nullptr);
 
-    assert(s->width(), 1);
+    assert(s->width() == 1);
     assert(s->coltypes_->equals(new String("S")));
     assert(s->col_name(0) == nullptr);
-
 }
 
 /**
@@ -213,7 +212,6 @@ void testAddColToEmptySchema()
     assert(s->col_name(0)->equals(new String("Lies")));
 }
 
-
 /**
  * @brief Testing adding a row with a name to an empty schema via checking that the length of the schema has changed
  * and that the name of the row is as expected.
@@ -225,7 +223,6 @@ void testAddRowToEmptySchema()
     s->add_row(new String("easepease"));
     assert(s->length() == 1);
     assert(s->row_name(0)->equals(new String("easepease")));
-
 }
 
 /**
@@ -407,7 +404,6 @@ void testAcceptEmptyRow()
     assert(rower_.accept(r));
     delete s;
 }
-
 
 /**
  * @brief tests Rower's accept() function on a row created from an dataframe based on Schema that has no columns but many rows
@@ -603,7 +599,6 @@ void testIntColumnClone7()
     delete i_;
 }
 
-
 /**
  * @brief Checking to see if we can accurately get the elements from an BoolColumn
  * 
@@ -618,7 +613,6 @@ void testBoolColumnGet1()
     delete i;
 }
 
-
 /**
  * @brief Testing set function via setting the values then getting them to check if we set the value correctly as each location.
  * 
@@ -628,7 +622,7 @@ void testBoolColumnSet2()
     BoolColumn *i = new BoolColumn(18, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false);
     // set 1 value in i to something else and check if that one value changed correctly
     i->set(8, false);
-    CS4500_ASSERT_FALSE(i->get(8));
+    assert(!i->get(8));
     // set all values in i to something else and check
     for (size_t j = 0; j < 18; j++)
     {
@@ -1158,7 +1152,6 @@ void testStringColumnSize4()
     delete i;
 }
 
-
 /**
  * @brief Testing if empty/nonempty StringColumn returns the expected pointer
  * 
@@ -1230,7 +1223,6 @@ void testStringColumnGetType6()
     delete i;
     delete i_;
 }
-
 
 /**
  * @brief Tests the clone method for an StringColumn. Because Columns have pointer equality, to see if clone is correct, we test to see if each element is the same. 
@@ -1495,5 +1487,6 @@ int main(int argc, char **argv)
     testAddRow3();
     testGet4();
     testSet5();
+    std::cout << "All tests passed!" << std::endl;
     return 0;
 }

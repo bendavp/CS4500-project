@@ -195,7 +195,7 @@ public:
             }
             else
             {
-                exit(1);
+                assert(false);
             }
         }
         f.done();

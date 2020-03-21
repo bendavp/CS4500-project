@@ -1,7 +1,7 @@
 #include <functional>
 #include <string>
 
-#include "StrConverter.hh"
+#include "StrConverter.h"
 
 // Code forked from Boat
 // https://github.com/gyroknight/boat-a1p1

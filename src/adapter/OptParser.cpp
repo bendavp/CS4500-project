@@ -1,6 +1,6 @@
 #include <cstring>
 
-#include "OptParser.hh"
+#include "OptParser.h"
 
 // Code forked from Boat
 // https://github.com/gyroknight/boat-a1p1

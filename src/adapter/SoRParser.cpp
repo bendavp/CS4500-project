@@ -3,9 +3,9 @@
 #include <filesystem>
 #include <sstream>
 
-#include "OptParser.hh"
-#include "SoRParser.hh"
-#include "StrConverter.hh"
+#include "OptParser.h"
+#include "SoRParser.h"
+#include "StrConverter.h"
 
 // Code forked from Boat
 // https://github.com/gyroknight/boat-a1p1
