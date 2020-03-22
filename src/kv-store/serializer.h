@@ -45,7 +45,7 @@ public:
     {
         StrBuff sb_ = StrBuff();
         size_t val_sz = val->size();
-        memcpy(buffer, val->steal(), val_sz);
+        memcpy(buffer, val->c_str(), val_sz);
     }
 
     String *deserialize_String(char *string_buffer)
@@ -62,13 +62,12 @@ public:
         String *s_temp;
         for (size_t i = 0; i < sz; i++)
         {
-            s_temp = strArray[i];
+            s_temp = strArray[i]->clone();
             sb_.c(s_temp->c_str(), s_temp->size()).c(sep, 1);
             delete s_temp;
         }
         String *s_ = sb_.get();
         size_t s_sz = s_->size();
-        std::cout << s_->c_str() << std::endl;
         memcpy(buffer, s_->steal(), s_sz);
         delete s_;
     }

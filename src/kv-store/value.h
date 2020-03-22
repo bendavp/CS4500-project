@@ -35,14 +35,12 @@ public:
 
         // adding num of columns
         int col = df->ncols();
-        std::cout << col << std::endl;
         char *buffer = new char[sizeof(int)];
         serializer_.serialize_int(col, buffer);
         builder.c(buffer, sizeof(int));
         delete[] buffer;
         // adding num of rows
         int row = df->nrows();
-        std::cout << row << std::endl;
         buffer = new char[sizeof(int)];
         serializer_.serialize_int(row, buffer);
         builder.c(buffer, sizeof(int));
@@ -191,7 +189,6 @@ public:
                         current++;
                     }
                     bool b_ = serializer_.deserialize_bool(bool_temp);
-                    std::cout << b_ << std::endl;
                     bc_->push_back(b_);
                 }
                 decoded_->add_column(bc_->clone(), nullptr);
@@ -265,6 +262,17 @@ public:
         Value *other_val = dynamic_cast<Value *>(other);
         if (other_val == nullptr)
             return false;
+        if (other_val->serialized_ == nullptr)
+        {
+            if (serialized_ != nullptr)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
         return strcmp(other_val->serialized_, serialized_) == 0;
     }
 

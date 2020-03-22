@@ -125,8 +125,8 @@ void test_keys()
 
     map->keys(keys);
 
-    // the keys array contains both keys in the map, in either order
-    assert(keys[0] == key1 && keys[1] == key2);
+    // the keys array contains both keys in the map, in some order
+    assert((keys[0]->equals(key1) && keys[1]->equals(key2)) || (keys[0]->equals(key2) && keys[1]->equals(key1)));
 }
 
 // make sure setting a key which was already in the map behaves properly
@@ -273,10 +273,11 @@ void testSerializerString()
     Serializer s_ = Serializer();
 
     String *str = new String("str");
-    char *encodedStr = new char[3];
+    char *encodedStr = new char[4];
     s_.serialize_String(str, encodedStr);
     String *decodedStr = s_.deserialize_String(encodedStr);
     delete[] encodedStr;
+
     assert(decodedStr->equals(str));
 }
 
@@ -301,7 +302,6 @@ void testSerializerStringArray()
     size_t buff_sz = 0;
     for (int i = 0; i < sz; i++)
     {
-        std::cout << strArray[i]->c_str() << ", ";
         buff_sz += strArray[i]->size() + 1;
     }
     char *encoded4 = new char[buff_sz];
@@ -328,7 +328,6 @@ void testSimpleDataFrameIBFS()
     df->add_column(c4, nullptr);
     // printing original DataFrame
     df->print();
-    std::cout << "finished printing df here" << std::endl;
     Value *v = new Value();
     v->encode(df);
 
@@ -364,6 +363,27 @@ void testSimpleDataFrameIBFSBS()
     df2->print();
 }
 
+void testTrivialApplication()
+{
+    size_t SZ = 10;
+    float *vals = new float[SZ];
+    float sum = 0;
+    for (size_t i = 0; i < SZ; ++i)
+        sum += vals[i] = i;
+    Key *key = new Key(new String("triv"), 0);
+    kvstore *kv = new kvstore();
+    DataFrame *df = DataFrame::fromArray(key, kv, SZ, vals);
+    df->print();
+    std::cout << "col types " << df->get_schema().coltypes_;
+    assert(df->get_float(0, 1) == 1);
+    DataFrame *df2 = kv->get(key)->decode();
+    for (size_t i = 0; i < SZ; ++i)
+        sum -= df2->get_float(0, i);
+    assert(sum == 0);
+    delete df;
+    delete df2;
+}
+
 int main()
 {
     test_get();
@@ -380,10 +400,12 @@ int main()
     testSerializerFloats();
     testSerializerString();
     testSerializerStringArray();
-
     testSimpleDataFrameIBFS();
     testSimpleDataFrameIBFSBS();
 
-    std::cout << "All tests passed!" << std::endl;
+    testTrivialApplication();
+
+    std::cout << "All kvstore tests passed!" << std::endl;
+
     return 0;
 }

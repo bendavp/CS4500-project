@@ -925,6 +925,7 @@ public:
         size_ = s.size();
         arr_fill_ = 0;                 // initialize as 0, will iterate through later
         arr_ = new String **[memory_]; // initializing string***
+        String *new_temp_;
         for (size_t i = 0; i < size_; i++)
         {
             // create new string array/string array pointer as necessary
@@ -940,8 +941,9 @@ public:
             }
             else
             {
-                String *new_ = s.get(i)->clone();
-                arr_[i / arr_size_][i % arr_size_] = new_;
+                new_temp_ = s.get(i)->clone();
+                arr_[i / arr_size_][i % arr_size_] = new_temp_->clone();
+                delete new_temp_;
             }
         }
         for (size_t i = arr_fill_; i < memory_; i++)

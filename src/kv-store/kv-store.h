@@ -1,3 +1,5 @@
+#pragma once
+
 #include "key.h"
 #include "value.h"
 
@@ -242,3 +244,32 @@ public:
         }
     }
 };
+
+class DataFrame;
+
+// makes a DataFrame with the given float vals; puts DataFrame as Value into given KVstore with the given Key
+DataFrame *DataFrame::fromArray(Key *key, kvstore *kv, size_t sz, float *vals)
+{
+    Schema *scm = new Schema();
+    DataFrame *df = new DataFrame(*scm);
+    Column *fc = new FloatColumn();
+    for (int i = 0; i < sz; i++)
+    {
+        fc->push_back(vals[i]);
+    }
+    df->add_column(fc, nullptr);
+    kv->put(key, new Value(df));
+    return df;
+}
+
+// makes a DataFrame with the given float val; puts DataFrame as Value into given KVstore with the given Key
+DataFrame *DataFrame::fromScalar(Key *key, kvstore *kv, float sum)
+{
+    Schema *scm = new Schema();
+    DataFrame *df = new DataFrame(*scm);
+    Column *fc = new FloatColumn();
+    fc->push_back(sum);
+    df->add_column(fc, nullptr);
+    kv->put(key, new Value(df));
+    return df;
+}

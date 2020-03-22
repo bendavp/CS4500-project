@@ -2,6 +2,7 @@
 
 #include "schema.h"
 #include "../utils/thread.h"
+#include "../kv-store/kv-store.h"
 
 #pragma once
 
@@ -343,6 +344,9 @@ public:
     /** Subclass responsibility, the body of the run method */
     void run();
 };
+
+class kvstore;
+class Key;
 
 /****************************************************************************
  * DataFrame::
@@ -697,6 +701,10 @@ public:
         RowPrinter r = RowPrinter();
         map(r);
     }
+
+    static DataFrame *fromArray(Key *key, kvstore *kv, size_t sz, float *vals);
+
+    static DataFrame *fromScalar(Key *key, kvstore *kv, float sum);
 };
 
 void RowThread::run()

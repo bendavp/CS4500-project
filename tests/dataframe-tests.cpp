@@ -1487,6 +1487,8 @@ int main(int argc, char **argv)
     testAddRow3();
     testGet4();
     testSet5();
-    std::cout << "All tests passed!" << std::endl;
+
+    std::cout << "All dataframe tests passed!" << std::endl;
+
     return 0;
 }
