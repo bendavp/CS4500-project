@@ -327,12 +327,14 @@ void testSimpleDataFrameIBFS()
     df->add_column(c3, nullptr);
     df->add_column(c4, nullptr);
     // printing original DataFrame
+    std::cout << "original dataframe" << std::endl;
     df->print();
     Value *v = new Value();
     v->encode(df);
 
     DataFrame *df2 = v->decode();
     // printing deserialized DataFrame
+    std::cout << "deserialized dataframe" << std::endl;
     df2->print();
 }
 
@@ -353,6 +355,7 @@ void testSimpleDataFrameIBFSBS()
     df->add_column(c5, nullptr);
     df->add_column(c6, nullptr);
     // printing original DataFrame
+    std::cout << "original dataframe" << std::endl;
     df->print();
 
     Value *v = new Value();
@@ -360,6 +363,7 @@ void testSimpleDataFrameIBFSBS()
 
     DataFrame *df2 = v->decode();
     // printing deserialized DataFrame
+    std::cout << "deserialized dataframe" << std::endl;
     df2->print();
 }
 
@@ -373,8 +377,11 @@ void testTrivialApplication()
     Key *key = new Key(new String("triv"), 0);
     kvstore *kv = new kvstore();
     DataFrame *df = DataFrame::fromArray(key, kv, SZ, vals);
+    std::cout << "width " << df->get_schema().width() << std::endl;
+    std::cout << df->get_schema().coltypes_->at(0) << std::endl;
+    std::cout << df->get_schema().coltypes_->c_str() << std::endl;
+    std::cout << "width " << df->get_schema().col_type(0) << std::endl;
     df->print();
-    std::cout << "col types " << df->get_schema().coltypes_;
     assert(df->get_float(0, 1) == 1);
     DataFrame *df2 = kv->get(key)->decode();
     for (size_t i = 0; i < SZ; ++i)
