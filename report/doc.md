@@ -39,12 +39,17 @@ The structure of the eau2 system is organized into three layers: application lay
 		- decode() => Dataframe*, deserializes the field (serialized_) back into a DataFrame*
 		- equals(Object*) => bool, from object class (checks if field is equivalent)
 		- hash() => int, from object
-- KV classes: 
+- KVstore: 
 	- fields: Key** (keys), Value** (values), size_ (number of pairs in the store), memory_size_ (max capacity of array)
 	- function:
 		- get(Key k) => Value, Gets a value from a KV-store based on the key
 		- getAndWait(Key k) => Value, Gets a value from a KV-store based on the key and waits for that key to exist (to be implemented fully next week alongside networking layer)
 		- put(Key k, Value v) => void, putting key-value pair into the KV-store
+- DataFrame:
+	- this is not a comprehensive list of all fields/methods but rather methods which incoporate the KV-store layer
+	- function:
+		- fromArray(Key *, kvstore *, size_t, float *) => DataFrame, constructs DataFrame with 1 column containing the given size_t number of given floats; adds this DataFrame (serialized) as a Value into the given kvstore with the given key
+		-fromScalar(Key *, kvstore *, float) => DataFrame, constructs a DataFrame with 1 column containing the given float; adds this DataFrame (serialized) as a Value into the given kvstore with the given key
 ### Networking Layer (Nodes)
 - we plan to start to work on troubleshooting the previous networking assignments in preparation for this; API will is TBD
 

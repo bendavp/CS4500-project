@@ -367,6 +367,18 @@ void testSimpleDataFrameIBFSBS()
     df2->print();
 }
 
+void testSerializeKey()
+{
+    Key *before = new Key(new String("hello"), 1);
+    char *encoded_key1 = before->encode();
+    Key *after = new Key(encoded_key1);
+
+    std::cout << "before: home: " << before->home << " name: " << before->name->c_str() << std::endl;
+    std::cout << "after: home: " << after->home << " name: " << after->name->c_str() << std::endl;
+
+    assert(before->equals(after));
+}
+
 void testTrivialApplication()
 {
     size_t SZ = 10;
@@ -377,18 +389,11 @@ void testTrivialApplication()
     Key *key = new Key(new String("triv"), 0);
     kvstore *kv = new kvstore();
     DataFrame *df = DataFrame::fromArray(key, kv, SZ, vals);
-    std::cout << "width " << df->get_schema().width() << std::endl;
-    std::cout << df->get_schema().coltypes_->at(0) << std::endl;
-    std::cout << df->get_schema().coltypes_->c_str() << std::endl;
-    std::cout << "width " << df->get_schema().col_type(0) << std::endl;
-    df->print();
     assert(df->get_float(0, 1) == 1);
     DataFrame *df2 = kv->get(key)->decode();
     for (size_t i = 0; i < SZ; ++i)
         sum -= df2->get_float(0, i);
     assert(sum == 0);
-    delete df;
-    delete df2;
 }
 
 int main()
@@ -409,6 +414,7 @@ int main()
     testSerializerStringArray();
     testSimpleDataFrameIBFS();
     testSimpleDataFrameIBFSBS();
+    testSerializeKey();
 
     testTrivialApplication();
 

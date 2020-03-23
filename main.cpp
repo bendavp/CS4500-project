@@ -2,10 +2,10 @@
 #include <string>
 #include <vector>
 
-#include "adapter/OptParser.h"
-#include "adapter/SoRParser.h"
-#include "adapter/StrConverter.h"
-#include "dataframe/dataframe.h"
+#include "src/adapter/OptParser.h"
+#include "src/adapter/SoRParser.h"
+#include "src/adapter/StrConverter.h"
+#include "src/dataframe/dataframe.h"
 
 void badArgError(const std::string &arg)
 {

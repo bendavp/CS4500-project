@@ -1,6 +1,6 @@
 
 HDRS := $(wildcard src/adapter/*.h)
-SRCS := $(wildcard src/adapter/*.cpp) src/main.cpp
+SRCS := $(wildcard src/adapter/*.cpp) main.cpp
 
 .PHONY: clean docker run build valgrind
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string.h>
 // based of our understanding from link below:
 // http://www.cplusplus.com/forum/general/201675/
@@ -5,6 +7,18 @@ class Serializer
 {
 public:
     Serializer() {}
+
+    void serialize_size_t(size_t val, char *buffer)
+    {
+        memcpy(buffer, &val, sizeof(size_t));
+    }
+
+    size_t deserialize_size_t(char *size_t_buffer)
+    {
+        size_t val;
+        memcpy(&val, size_t_buffer, sizeof(size_t));
+        return val;
+    }
 
     void serialize_int(int val, char *buffer)
     {

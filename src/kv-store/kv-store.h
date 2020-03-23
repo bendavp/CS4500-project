@@ -245,7 +245,6 @@ public:
     }
 };
 
-// makes a DataFrame with the given float vals; puts DataFrame as Value into given KVstore with the given Key
 DataFrame *DataFrame::fromArray(Key *key, kvstore *kv, size_t sz, float *vals)
 {
     Schema *scm = new Schema();

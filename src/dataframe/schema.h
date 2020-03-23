@@ -72,10 +72,8 @@ public:
             }
         }
         char *c = new char(typ);
-        std::cout << "adding col type of " << c << std::endl;
         coltypes_ = StrBuff().c(coltypes_->c_str()).c(c, 1).get();
         delete c;
-        std::cout << coltypes_->c_str() << std::endl;
         col_names_->push_back(name);
     }
 

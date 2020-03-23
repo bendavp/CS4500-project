@@ -47,7 +47,7 @@ public:
         delete[] buffer;
 
         // adding the col-types into the encoded
-        String *schema_coltypes = df->get_schema().coltypes_;
+        String *schema_coltypes = df->get_schema().coltypes_->clone();
         builder.c(schema_coltypes->c_str());
 
         // adding the dataframe information column by column

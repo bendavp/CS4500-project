@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../dataframe/dataframe.h"
 
 class FibCalc : public Fielder

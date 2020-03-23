@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../utils/string.h"
+#include "serializer.h"
 
 class Key : public Object
 {
@@ -52,37 +53,52 @@ public:
 
     char *encode()
     {
-        // casting everything as a char array
-        StrBuff encoded_ = StrBuff();
-        encoded_.c(reinterpret_cast<char *>(home)).c(name->c_str());
+        Serializer s_ = Serializer();
+        StrBuff sb_ = StrBuff();
+        char *buffer = new char[sizeof(size_t)];
+        s_.serialize_size_t(home, buffer);
+        sb_.c(buffer, sizeof(size_t));
+        delete[] buffer;
 
-        // converting StrBuff to char*
-        String *encodedStr = encoded_.get();
-        char *serialized_ = new char[encodedStr->size()];
-        serialized_ = encodedStr->c_str();
-        delete encodedStr;
+        buffer = new char[name->size()];
+        s_.serialize_String(name, buffer);
+        sb_.c(buffer, name->size());
+        delete[] buffer;
+
+        buffer = {"\t"};
+        sb_.c(buffer, 1);
+
+        String *temp_ = sb_.get();
+        char *serialized_ = temp_->steal();
+        delete temp_;
 
         return serialized_;
     }
 
     void decode(char *serialized)
     {
-        size_t sz_size = sizeof(size_t);
-        char *sz_temp = new char[sz_size];
+        Serializer s_ = Serializer();
 
-        // deserializing the home node
-        for (int i = 0; i < sz_size; i++)
+        char *temp_buffer = new char[sizeof(size_t)];
+        for (int i = 0; i < sizeof(size_t); i++)
         {
-            sz_temp[i] = serialized[i];
+            temp_buffer[i] = serialized[i];
         }
-        home = *reinterpret_cast<size_t *>(sz_temp);
 
-        // deserializing the name/key value
-        StrBuff key_ = StrBuff();
-        for (int i = sz_size; i < strlen(serialized); i++)
+        home = s_.deserialize_size_t(temp_buffer);
+        delete[] temp_buffer;
+
+        StrBuff sb_ = StrBuff();
+
+        int i = sizeof(size_t);
+        temp_buffer = new char[1];
+        while (serialized[i] != '\t')
         {
-            key_.c(serialized[i]);
+            temp_buffer[0] = serialized[i];
+            sb_.c(temp_buffer, 1);
+            i++;
         }
-        name = key_.get();
+
+        name = sb_.get();
     }
 };

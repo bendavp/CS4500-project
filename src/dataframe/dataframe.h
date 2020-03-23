@@ -2,7 +2,6 @@
 
 #include "schema.h"
 #include "../utils/thread.h"
-#include "../kv-store/kv-store.h"
 
 #pragma once
 
@@ -256,63 +255,6 @@ public:
         delete other;
     }
 };
-
-/*
-class AddAllInts : public Rower
-{
-public:
-    int total = 0;
-
-    bool accept(Row &r)
-    {
-        int val1 = r.get_int(0);
-        int val2 = r.get_int(1);
-        int val3 = r.get_int(2);
-        total = calcFib(val1) + calcFib(val2) + calcFib(val3);
-        return true;
-    }
-
-    void join_delete(Rower *other)
-    {
-        AddAllInts *r = static_cast<AddAllInts *>(other);
-        total += r->total;
-        delete r;
-        delete other;
-    }
-
-    Rower *clone()
-    {
-        return new AddAllInts();
-    }
-
-    int calcFib(int i)
-    {
-        int first = 0;
-        int second = 1;
-        int total = 0;
-        if (i == 0)
-        {
-            total = first;
-        }
-        else if (i == 2)
-        {
-            total = second;
-        }
-        else
-        {
-            int next;
-            for (int j = 2; j < i; j++)
-            {
-                next = first + second;
-                first = second;
-                second = next;
-            }
-            total = next;
-        }
-        return total;
-    }
-};
-*/
 
 /****************************************************************************
  * RowThread::
