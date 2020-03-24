@@ -8,8 +8,8 @@ class kvstore : public Object
 public:
     Key **key_arr_;
     Value **val_arr_;
-    size_t size_;
-    size_t memory_size_;
+    size_t size_;        // the number of elements
+    size_t memory_size_; // the size of the underlying arrays
 
     kvstore() : Object()
     {
@@ -39,7 +39,7 @@ public:
         }
         Value **tempVals = new Value *[memory_size_];
 
-        size_t hash_index;
+        size_t hash_index; // the index at which the key/value will be put in the array
         for (size_t i = 0; i < memory_size_ / 2; i++)
         {
             if (key_arr_[i] != nullptr)
