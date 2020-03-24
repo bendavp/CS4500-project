@@ -24,7 +24,7 @@ public:
     }
 
     /**
-     * @brief encodes the given DataFrame into a char* 
+     * @brief encodes the given DataFrame into a char* and stores the encoded DataFrame in serialized_
      * 
      * @param df -- DataFrame to be encoded
      */
@@ -78,7 +78,7 @@ public:
                     delete[] buffer;
                 }
             }
-            // floats (casted into a double first due to inability to just cast float into char*)
+            // floats
             else if (schema_coltypes->at(i) == 'F')
             {
                 for (int j = 0; j < row; j++)
@@ -124,10 +124,8 @@ public:
      */
     DataFrame *decode()
     {
-        Serializer serializer_ = Serializer();
         assert(serialized_ != nullptr);
-        // size_t encoded_size = strlen(serialized_); // make sure we don't go past how many bytes we serialized
-        // assert(encoded_size != 0);
+        Serializer serializer_ = Serializer();
 
         // size of the different primitives when encoded
         size_t int_size = sizeof(int);
@@ -139,6 +137,7 @@ public:
         char *float_temp = new char[float_size];
 
         size_t current = 0; // keep track of how far along we have moved
+
         // getting the total num of columns
         for (int i = current; i < int_size; i++)
         {
@@ -159,16 +158,13 @@ public:
         int row = serializer_.deserialize_int(int_temp);
 
         // getting the col types
-        // StrBuff sb_;
         char *ct_ = new char[col];
         current2 = current;
         for (int i = current2; i < current2 + col; i++)
         {
-            // sb_.c(serialized_[i]);
             ct_[i - current2] = serialized_[i];
             current++;
         }
-        // String *col_types = sb_.get();
         String *col_types = new String(ct_);
 
         Schema *scm = new Schema();
@@ -179,7 +175,9 @@ public:
             // adding a bool column
             if (col_types->at(i) == 'B')
             {
+                // initializing empty bool column
                 Column *bc_ = new BoolColumn();
+                // iterating through serialized and adding each deserialized bool to the column
                 for (int i = 0; i < row; i++)
                 {
                     current2 = current;
@@ -191,13 +189,16 @@ public:
                     bool b_ = serializer_.deserialize_bool(bool_temp);
                     bc_->push_back(b_);
                 }
+                // adding copy of bool column to the dataframe
                 decoded_->add_column(bc_->clone(), nullptr);
-                delete bc_;
+                delete bc_; // delete to reset
             }
             // adding an int column
             else if (col_types->at(i) == 'I')
             {
+                // initializing empty int column
                 Column *ic_ = new IntColumn();
+                // iterating through serialized and adding each deserialized int to the column
                 for (int i = 0; i < row; i++)
                 {
                     current2 = current;
@@ -209,13 +210,16 @@ public:
                     int i_ = serializer_.deserialize_int(int_temp);
                     ic_->push_back(i_);
                 }
+                // adding copy of int column to the dataframe
                 decoded_->add_column(ic_->clone(), nullptr);
-                delete ic_;
+                delete ic_; // delete to reset
             }
             // adding a float column
             else if (col_types->at(i) == 'F')
             {
+                // initializing empty float column
                 Column *fc_ = new FloatColumn();
+                // iterating through serialized and adding each deserialized float to the column
                 for (int i = 0; i < row; i++)
                 {
                     current2 = current;
@@ -227,30 +231,35 @@ public:
                     float f_ = serializer_.deserialize_float(float_temp);
                     fc_->push_back(f_);
                 }
+                // adding copy of float column to the dataframe
                 decoded_->add_column(fc_->clone(), nullptr);
-                delete fc_;
+                delete fc_; // delete to reset
             }
             // adding a String column
             else if (col_types->at(i) == 'S')
             {
+                // initializing new string column
                 Column *sc_ = new StringColumn();
-                StrBuff sb_;
+                StrBuff sb_; // strbuff will be used to build each string
                 char *toAdd = new char[1];
+                // iterating through serialized to build strings and add the built strings to the string column
                 for (int i = 0; i < row; i++)
                 {
                     sb_ = StrBuff();
                     int j = current;
+                    // continuing to iterate through and add the character to the strbuff until we see the separator ('/t')
                     while (serialized_[j] != sep)
                     {
                         toAdd[0] = serialized_[j];
                         sb_.c(toAdd, 1);
                         j++;
                     }
-                    current = j + 1;
+                    current = j + 1; // need to set the head to the character after the separator (otherwise an empty string will be added)
                     sc_->push_back(sb_.get());
                 }
+                // adding copy of string column to the dataframe
                 decoded_->add_column(sc_->clone(), nullptr);
-                delete sc_;
+                delete sc_; // delete to reset
             }
         }
         delete col_types;
