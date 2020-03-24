@@ -65,7 +65,8 @@ public:
         sb_.c(buffer, name->size());
         delete[] buffer;
 
-        buffer = {"\t"};
+        buffer = new char[1];
+        buffer[0] = '\t';
         sb_.c(buffer, 1);
 
         String *temp_ = sb_.get();

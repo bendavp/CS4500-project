@@ -65,9 +65,3 @@ We discussed the classes that will make up the kvstore layer, and focused mostly
 For this milestone, we aimed to implement functionality that will allow us to encode/decode DataFrames into a char* as well as store these char* with Keys in the KV-store. Our goal is to get this working as if there is only one node. More specifically, we aim to be able to pass in these serialized DataFrames into the KV-store with a Key and retrieve out the Value/DataFrame with the Key. 
 
 We will start to troubleshoot and fix the networking from the past to prepare to integrate this into the system.
-
-# pls gib 100 ty :-)
-
-![Hosico](https://www.catster.com/wp-content/uploads/2017/02/Hosico1.png)
-
-![Chess](https://i.imgur.com/ZLZL0Or.gif)
