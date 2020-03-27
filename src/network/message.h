@@ -1,3 +1,8 @@
+#pragma once
+
+#include <stdio.h>
+#include "../utils/string.h"
+
 enum class MsgKind
 {
     Ack,
@@ -24,8 +29,6 @@ class Message : public Object
     size_t target_; // the index of the receiver node
 
     size_t id_; // an id t unique within the node
-
-    ...
 };
 
 class Ack : public Message

@@ -7,7 +7,9 @@
 
 /*****************************************************************************
  * Fielder::
- * A field vistor invoked by Row.
+ * A field vistor invoked by Row. 
+ * 
+ * Here for testing purposes -- see Printer
  */
 class Fielder : public Object
 {

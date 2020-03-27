@@ -1,5 +1,21 @@
 #pragma once
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <string.h>
+#include <time.h>
+#include "message.h"
+
+class NodeInfo : public Object
+{
+public:
+    size_t id;
+    sockaddr_in address;
+};
+
 class Network : public Object
 {
 public:
@@ -148,10 +164,3 @@ public:
         return msg;
     }
 };
-
-class NodeInfo : public Object
-{
-public:
-    size_t id;
-    sockaddr_in address;
-}
