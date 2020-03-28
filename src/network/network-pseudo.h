@@ -1,18 +1,67 @@
+#pragma once
 
-MQArray(size_t cap) : Array(cap) {}
-MessageQueue *get(size_t i) { return dynamic_case<MessageQueue *>(get_(i)); }
+#include "../utils/queue.h"
+#include "message.h"
+#include "../utils/thread.h"
+#include "../utils/map.h"
+#include "../utils/array.h"
 
-extern Args arg;
-
-class NetworkPseudo : public NetworkIfc
+class MessageQueue : public Queue<Message>
 {
 public:
-    String_size_t_Map threads_;
-    MQArray qs_;
+    Lock lock_;
 
-    NetworkPseudo() : qs_(1)
+    MessageQueue() : Queue<Message>() {}
+
+    void push(Message *msg)
     {
-        for (size_t i = 0; i < arg.num_nodes; i++)
+        lock_.lock();
+        add(msg);
+        lock_.notify_all();
+        lock_.unlock();
+    }
+
+    Message *pop()
+    {
+        lock_.lock();
+        while (size_ == 0)
+            lock_.wait();
+        Message *result = remove();
+        lock_.unlock();
+        return result;
+    }
+};
+
+class StringSztMap : public Map<String, size_t>
+{
+public:
+    Lock lock_;
+
+    void put(String *s, size_t n)
+    {
+        lock_.lock();
+        add(s, n);
+        lock_.unlock();
+    }
+
+    size_t retrieve(String *s)
+    {
+        lock_.lock();
+        size_t res = get(s);
+        lock_.unlock();
+        return res;
+    }
+};
+
+class NetworkPseudo : public Object
+{
+public:
+    StringSztMap threads_;
+    FastArray<MessageQueue> qs_;
+
+    NetworkPseudo(size_t num_threads) : Object()
+    {
+        for (size_t i = 0; i < num_threads; i++)
         {
             qs_.push_back(new MessageQueue());
         }
@@ -23,11 +72,11 @@ public:
      * 
      * @param idx 
      */
-    void register_node(size_t idx) override
+    void register_node(size_t idx)
     {
+        assert(threads_.size() <= qs_.size());
         String *tid = Thread::thread_id();
-        threads_.set_u(*tid, idx);
-        delete tid;
+        threads_.put(tid, idx);
     }
 
     /**
@@ -35,16 +84,16 @@ public:
      * 
      * @param m 
      */
-    void send_m(Message *m) override
+    void send_m(Message *m)
     {
-        qs_get(msg->target_)->push(msg);
+        qs_.get(m->target_)->push(m);
     }
 
-    Message *recv_m() override
+    Message *recv_m()
     {
         String *tid = Thread::thread_id();
-        size_t i = threads_.get(*tid);
+        size_t i = threads_.get(tid);
         delete tid;
-        return qs_.get(i)->pop)();
+        return qs_.get(i)->pop();
     }
 };

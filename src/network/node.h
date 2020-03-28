@@ -3,6 +3,8 @@
 #include "../utils/thread.h"
 #include "../kv-store/kv-store.h"
 #include "../dataframe/dataframe.h"
+#include "network-pseudo.h"
+#include "message.h"
 
 class Node : public Thread
 {
@@ -17,15 +19,14 @@ public:
 
     void add(Key *key, DataFrame *df)
     {
+        Value *val = new Value(df);
         if (key->home != index_)
         {
-            // send the key to the right node
-        }
+                }
         // this is the correct node for the key
         else
         {
             assert(!kvstore->has(key));
-            Value *val = new Value(df);
             kvstore->put(key, val);
         }
     }

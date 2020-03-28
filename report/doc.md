@@ -60,6 +60,9 @@ The structure of the eau2 system is organized into three layers: application lay
 - User interaction with the application layer?
 
 ## Status
+### Outstanding Issue
+We are **very aware** that we need to do refactoring of our code which we are using from previous assignments. Due to the time we're using to implement new features (such as the networking (pseudonetwork) layer), we have decided to hold off on refactoring more than necessary until Milestone 5. In the case of our implementations from now going forward, we have refactored/lowered the amount of duplicated code as we are implementing these new features.
+### General Update
 We discussed the classes that will make up the kvstore layer, and focused mostly on this layer for this milestone. We decided to make our Value and Key class be able to serialize/deserialize themselves (in the case of Value, it represents a serialized DataFrame, and when deserialized, it will be a DataFrame)
 
 For this milestone, we aimed to implement functionality that will allow us to encode/decode DataFrames into a char* as well as store these char* with Keys in the KV-store. Our goal is to get this working as if there is only one node. More specifically, we aim to be able to pass in these serialized DataFrames into the KV-store with a Key and retrieve out the Value/DataFrame with the Key. 
