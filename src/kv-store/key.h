@@ -15,16 +15,15 @@ public:
         home = 0;
     }
 
-    Key(size_t h) : Object()
+    Key(size_t h) : Key()
     {
-        name = new String("key");
         home = h;
     }
 
-    Key(String *n) : Object()
+    Key(String *n) : Key()
     {
+        delete name;
         name = n;
-        home = 0;
     }
 
     Key(String *n, size_t h) : Object()

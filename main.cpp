@@ -6,6 +6,7 @@
 #include "src/adapter/SoRParser.h"
 #include "src/adapter/StrConverter.h"
 #include "src/dataframe/dataframe.h"
+#include "src/network/node.h"
 
 void badArgError(const std::string &arg)
 {
@@ -44,11 +45,13 @@ int main(int argc, char *argv[])
     Opt opt;
 
     optParser.addFlag("f", 1);
+    optParser.addFlag("num_nodes", 1);
 
     SoRParser sorParser;
     std::vector<std::string> cmdArgs;
 
     std::string filename;
+    size_t num_nodes;
     // int size = 0;
     // bool found_size = false;
     // int start = 0;
@@ -62,6 +65,10 @@ int main(int argc, char *argv[])
         {
             filename = optVals.front();
         }
+        if (flag == "num_nodes")
+        {
+            num_nodes = stoi(optVals.front());
+        }
         else
         {
             badArgError(flag);
@@ -72,6 +79,15 @@ int main(int argc, char *argv[])
     {
         std::cout << "Unable to open file " << filename << std::endl;
         exit(1);
+    }
+
+    assert(num_nodes > 0);
+
+    if (num_nodes != 1)
+    {
+        for (size_t i = 0; i < num_nodes; i++)
+        {
+                }
     }
 
     // getting total row number
@@ -142,6 +158,10 @@ int main(int argc, char *argv[])
             }
         }
         df->add_row(*r);
+
+        if (df->nrows() == 100000)
+        {
+        }
     }
 
     delete r;

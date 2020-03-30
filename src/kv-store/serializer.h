@@ -8,6 +8,32 @@ class Serializer
 public:
     Serializer() {}
 
+    Key *deserialize_key(char *key_buffer)
+    {
+        char *temp_buffer = new char[sizeof(size_t)];
+        for (int i = 0; i < sizeof(size_t); i++)
+        {
+            temp_buffer[i] = serialized[i];
+        }
+
+        home = deserialize_size_t(temp_buffer);
+        delete[] temp_buffer;
+
+        StrBuff sb_ = StrBuff();
+
+        int i = sizeof(size_t);
+        temp_buffer = new char[1];
+        while (serialized[i] != '\t')
+        {
+            temp_buffer[0] = serialized[i];
+            sb_.c(temp_buffer, 1);
+            i++;
+        }
+
+        name = sb_.get();
+        return new Key(name, home)
+    }
+
     void serialize_size_t(size_t val, char *buffer)
     {
         memcpy(buffer, &val, sizeof(size_t));

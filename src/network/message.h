@@ -39,7 +39,6 @@ enum class MsgKind
  * @param kind_ The kind of message this message is (see enum above)
  * @param sender_ the index of the node of the sender of this message
  * @param target_ the index of the node of the receiver of this message
- * @param id_ the unique ID of this message in the network
  * 
  * @author jv 
  * 
@@ -52,61 +51,60 @@ public:
     size_t sender_; // the index of the sender node
 
     size_t target_; // the index of the receiver node
-
-    size_t id_; // an id t unique within the node
 };
 
 /**
  * @brief Message to get a Value from a specified Node's (based off of the Key) KV-store with the given Key
  * 
+ * @author BK and AT
  */
 class Get : public Message
 {
 public:
     Key *key_;
 
-    Get(size_t id, size_t sender, Key *key)
+    Get(size_t sender, Key *key)
     {
         kind_ = MsgKind::Get;
         key_ = key;
         target_ = key_->home; // getting the node that the key is on
         sender_ = sender;
-        id_ = id;
     }
 
     size_t hash_me() override
     {
-        return key_->hash() + target_ + sender_ + id_;
+        return key_->hash() + target_ + sender_;
     }
 };
 
 /**
  * @brief 
  * 
+ * @author BK and AT
  */
 class WaitAndGet : public Message
 {
 public:
     Key *key_;
 
-    WaitAndGet(size_t id, size_t sender, Key *key)
+    WaitAndGet(size_t sender, Key *key)
     {
         kind_ = MsgKind::WaitAndGet;
         key_ = key;
         target_ = key_->home; // getting the node that the key is on
         sender_ = sender;
-        id_ = id;
     }
 
     size_t hash_me() override
     {
-        return key_->hash() + target_ + sender_ + id_;
+        return key_->hash() + target_ + sender_;
     }
 };
 
 /**
  * @brief Message to put the given Key and Value into the specified Node (based on the Key)
  * 
+ * @author AT and BK
  */
 class Put : public Message
 {
@@ -114,18 +112,17 @@ public:
     Key *key_;
     Value *val_;
 
-    Put(size_t id, size_t sender, Key *key, Value *val)
+    Put(size_t sender, Key *key, Value *val)
     {
         kind_ = MsgKind::Put;
         key_ = key;
         val_ = val;
         target_ = key_->home;
         sender_ = sender;
-        id_ = id;
     }
 
     size_t hash_me() override
     {
-        return key_->hash() + val_->hash() + target_ + sender_ + id_;
+        return key_->hash() + val_->hash() + target_ + sender_;
     }
 };

@@ -3,24 +3,63 @@
 
 #pragma once
 
-/**
- * @brief 
- * 
- */
+enum class ValueKind
+{
+    Unassigned,
+    DataFrame,
+    Keys
+};
+
 class Value : public Object
 {
 public:
     char *serialized_;
     char sep = '\t';
+    ValueKind vk;
 
     Value() : Object()
     {
         serialized_ = nullptr;
+        vk = ValueKind::Unassigned;
     }
 
-    Value(DataFrame *df) : Object()
+    Value(DataFrame *df) : Value()
     {
         encode(df);
+    }
+
+    Value(Key **keys, size_t sz) : Value()
+    {
+        encode(keys, sz);
+    }
+
+    void encode(Key **keys, size_t numKeys)
+    {
+        assert(serialized_ == nullptr);
+        assert(vk == ValueKind::Unassigned);
+
+        // setting the type to be key array
+        vk = ValueKind::Keys;
+
+        StrBuff builder = StrBuff();
+
+        // storing size of the key array
+        char *buffer = new char[sizeof(size_t)];
+        serializer_.serialize_size_t(col, buffer);
+        builder.c(buffer, sizeof(size_t));
+        delete[] buffer;
+
+        // encoding the keys
+        char *sep_ = new char[1];
+        sep_[0] = sep;
+        for (size_t i = 0; i < numKeys; i++)
+        {
+            builder.c(keys[i]->encode(), keys[i]->name->size() + 4);
+        }
+        String *encodedStr = builder.get();
+        serialized_ = encodedStr->steal();
+        delete encodedStr;
+        delete header;
     }
 
     /**
@@ -30,6 +69,12 @@ public:
      */
     void encode(DataFrame *df)
     {
+        assert(serialized_ == nullptr);
+        assert(vk == ValueKind::Unassigned);
+
+        // setting the type to be dataframe chunk
+        vk = ValueKind::DataFrame;
+
         Serializer serializer_ = Serializer();
         StrBuff builder = StrBuff();
 
@@ -117,12 +162,50 @@ public:
         delete schema_coltypes;
     }
 
+    Key **decode_keys()
+    {
+        assert(serialized_ != nullptr);
+        Serializer serializer_ = Serializer();
+
+        size_t current = 0; // the head of the serialized string
+        char *buffer = new char[sizeof(size_t)];
+        for (size_t i = 0; i < sizeof(size_t); i++)
+        {
+            buffer[i] = serialized_[i];
+            current++;
+        }
+        size_t numKeys = serializer_.deserialize_size_t(buffer);
+        delete buffer;
+
+        Key **keys = new Key[numKeys];
+        StrBuff sb_ = StrBuff();
+        char *toAdd = new char[1];
+        String *temp;
+        char *buffer;
+        for (size_t i = 0; i < numKeys; i++)
+        {
+            while (serialized_[current] != '\t')
+            {
+                toAdd[0] = serialized[current];
+                sb_.c(toAdd, 1);
+                current++;
+            }
+            toAdd[0] = serialized[current]; // reappends the /t needed for deserialization of key
+            sb_.c(toAdd, 1);
+            temp = sb_.get();
+            buffer = temp->steal();
+            delete temp;
+            keys[i] = serializer_.deserialize_key(buffer); // deserializing and adding the key to the array
+            delete buffer;
+        }
+    }
+
     /**
      * @brief Decodes the serialization_ into a DataFrame
      * 
      * @return DataFrame* 
      */
-    DataFrame *decode()
+    DataFrame *decode_df()
     {
         assert(serialized_ != nullptr);
         Serializer serializer_ = Serializer();
@@ -268,7 +351,7 @@ public:
 
     bool equals(Object *other)
     {
-        Value *other_val = dynamic_cast<Value *>(other);
+        Value<T> *other_val = dynamic_cast<Value<T> *>(other);
         if (other_val == nullptr)
             return false;
         if (other_val->serialized_ == nullptr)
