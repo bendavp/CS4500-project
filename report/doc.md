@@ -51,7 +51,24 @@ The structure of the eau2 system is organized into three layers: application lay
 		- fromArray(Key *, kvstore *, size_t, float *) => DataFrame, constructs DataFrame with 1 column containing the given size_t number of given floats; adds this DataFrame (serialized) as a Value into the given kvstore with the given key
 		-fromScalar(Key *, kvstore *, float) => DataFrame, constructs a DataFrame with 1 column containing the given float; adds this DataFrame (serialized) as a Value into the given kvstore with the given key
 ### Networking Layer (Nodes)
-- we plan to start to work on troubleshooting the previous networking assignments in preparation for this; API will is TBD
+### 
+- Node: (is a Thread)
+	- fields: network_ (PseudoNetwork communication layer), kvstore, index_, lock_, reply_ (Reply *)
+    - function:
+		- run() => void, continues to process messages until it receives a kill message (then node terminates via join())
+		- add(Key *, Value *) => void, adds the given Key/Value into its kvstore if the Key belongs to this node; otherwise, sends a message to the node with the key/value to add through the network layer
+		- get(Key *) => Value *, gets the given Value from the kvstore if the Key belongs to this node; otherwise, sends a message to the node with the key/value and waits for a Reply message
+		- waitAndGet(Key *) => Value *, waits for the given Key to exist then returns the Value associated if the Key belonds to this node; otherwise, sends a message to the node with the key/value and wait for a Reply message
+- PseudoNetwork:
+	- fields: FastArray of MessageQueues (stores the MessageQueues for each node), StringSztMap (maps Thread Ids (from String) to a size_t), current_node_idx (stores which node_idx we are connected with/to)
+	- function:
+		- register_node() => void, creates and adds a new node to this communication layer
+		- check_next_node_idx() => size_t, checks what the index of the next node would be if there was one added
+		- send_m(Message *m) => void, sends Message *m by adding it to the appropriate MessageQueue (node idx corresponds with MessageQueue index)
+		- recv_m() => Message *, pops a Message off of the appropriate MessageQueue and returns it
+### Utility/Helper classes
+- MessageQueue: functions as a Queue of Messages with a Lock
+- StringSztMap: Hashmap for String and size_t	
 
 ## Use Cases
 - WordCounter: Load a text file of words into the Application layer, KVstore layer will distribute the words among all available nodes, obtain the number of characters in each word (this work is distributed across multiple nodes), and aggregate the results to show to the application layer (i.e. the client)
@@ -63,8 +80,6 @@ The structure of the eau2 system is organized into three layers: application lay
 ### Outstanding Issue
 We are **very aware** that we need to do refactoring of our code which we are using from previous assignments. Due to the time we're using to implement new features (such as the networking (pseudonetwork) layer), we have decided to hold off on refactoring more than necessary until Milestone 5. In the case of our implementations from now going forward, we have refactored/lowered the amount of duplicated code as we are implementing these new features.
 ### General Update
-We discussed the classes that will make up the kvstore layer, and focused mostly on this layer for this milestone. We decided to make our Value and Key class be able to serialize/deserialize themselves (in the case of Value, it represents a serialized DataFrame, and when deserialized, it will be a DataFrame)
+We decided to implement a pseudonetworking layer instead of a true networking layer. We feel that given the timeframe of these assignments and our lack of prior knowledge/general understanding of networks, this is going to be the best approach for us. We were able to mostly complete a basic implementation of the pseudonetwork for this week, however, we are a little behind in that we have not thoroughly tested it yet, nor have we implemented dividing the file into chunks and spreading those chunks across the network, although we _have_ implemented a way for the network to store these chunks. We have also included a KDstore in the application layer, which is a Map that stores Keys mapped to Keys, the idea being that the value of the KDstore will actually be a Key that represents a DataFrame, but is actually an array of more Keys. The reasoning behind this is that the Key array points to other keys spread across the nodes in the network that contain a chunk of the desired DataFrame. So, when the Keys in the Key array are put together, we get the whole DataFrame.
 
-For this milestone, we aimed to implement functionality that will allow us to encode/decode DataFrames into a char* as well as store these char* with Keys in the KV-store. Our goal is to get this working as if there is only one node. More specifically, we aim to be able to pass in these serialized DataFrames into the KV-store with a Key and retrieve out the Value/DataFrame with the Key. 
-
-We will start to troubleshoot and fix the networking from the past to prepare to integrate this into the system.
+Another goal we reached this week was the inclusion of C++ templates in our code to reduce duplication, especially in our `utils` classes. Queue and FastArray are now templates, as well as Map which is actually 2 templates (one for primitive->`Object*` mapping, and another for `Object*`->`Object*`). The reason that the primitive FastArrays are still there is because it would be a rather large effort to refactor everywhere our current codebase uses the primitive FastArrays to use a primitive template, however this is an effort we will undergo in the future (see Outstanding Issue, above). 

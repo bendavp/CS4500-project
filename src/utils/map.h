@@ -103,10 +103,10 @@ public:
         i = 0;
 
       if (i == hash_index - 1)
-        return nullptr;
+        return -1;
     }
 
-    return nullptr;
+    return -1;
   }
 
   /**
@@ -115,7 +115,6 @@ public:
   void add(T *key, U value)
   {
     assert(key != nullptr);
-    assert(value != nullptr);
     assert(!has(key));
 
     if (size_ * 2 == memory_size_)

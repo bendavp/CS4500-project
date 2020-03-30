@@ -51,6 +51,8 @@ public:
     size_t sender_; // the index of the sender node
 
     size_t target_; // the index of the receiver node
+
+    virtual Message *clone();
 };
 
 /**
@@ -75,6 +77,11 @@ public:
     {
         return key_->hash() + target_ + sender_;
     }
+
+    Get *clone() override
+    {
+        return new Get(sender_, key_->clone());
+    }
 };
 
 /**
@@ -98,6 +105,11 @@ public:
     size_t hash_me() override
     {
         return key_->hash() + target_ + sender_;
+    }
+
+    WaitAndGet *clone() override
+    {
+        return new WaitAndGet(sender_, key_->clone());
     }
 };
 
@@ -124,5 +136,61 @@ public:
     size_t hash_me() override
     {
         return key_->hash() + val_->hash() + target_ + sender_;
+    }
+
+    Put *clone() override
+    {
+        return new Put(sender_, key_->clone(), val_->clone());
+    }
+};
+
+/**
+ * @brief Message to give a value back when another node has requested 
+ * it via a Get Message
+ * 
+ * @author BK and AT
+ */
+class Reply : public Message
+{
+public:
+    Value *val_;
+
+    Reply(size_t sender, size_t target, Value *val)
+    {
+        kind_ = MsgKind::Reply;
+        sender_ = sender;
+        target_ = target;
+        val_ = val;
+    }
+
+    size_t hash_me() override
+    {
+        return val_->hash() + target_ + sender_;
+    }
+
+    Reply *clone() override
+    {
+        return new Reply(sender_, target_, val_->clone());
+    }
+};
+
+class Kill : public Message
+{
+public:
+    Kill(size_t sender, size_t target)
+    {
+        kind_ = MsgKind::Kill;
+        sender_ = sender;
+        target_ = target;
+    }
+
+    size_t hash_me() override
+    {
+        return target_ + sender_;
+    }
+
+    Kill *clone() override
+    {
+        return new Kill(sender_, target_);
     }
 };

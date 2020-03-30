@@ -30,6 +30,16 @@ public:
         lock_.unlock();
         return result;
     }
+
+    MessageQueue *clone()
+    {
+        MessageQueue *res = new MessageQueue();
+        for (int i = 0; i < size_; i++)
+        {
+            res->add(get_el_at(i)->clone());
+        }
+        return res;
+    }
 };
 
 class StringSztMap : public OPMap<String, size_t>

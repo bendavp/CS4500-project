@@ -75,7 +75,7 @@ public:
   /* Returns if given Object is the same as this Queue */
   bool equals(Object *o)
   {
-    MessageQueue *other = dynamic_cast<MessageQueue *>(o);
+    Queue<T> *other = dynamic_cast<Queue<T> *>(o);
     if (other == nullptr)
     {
       return false;
@@ -171,5 +171,15 @@ public:
   size_t get_index_at(size_t elNum)
   {
     return (firstIndex_ + elNum) % memory_size_;
+  }
+
+  Queue<T> *clone()
+  {
+    Queue<T> *res = new Queue<T>();
+    for (int i = 0; i < size_; i++)
+    {
+      res->add(get_el_at(i)->clone());
+    }
+    return res;
   }
 };

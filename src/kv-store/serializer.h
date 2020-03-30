@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string.h>
+#include "key.h"
+
 // based of our understanding from link below:
 // http://www.cplusplus.com/forum/general/201675/
 class Serializer
@@ -8,30 +10,52 @@ class Serializer
 public:
     Serializer() {}
 
+    void *serialize_key(Key *key, char *buffer)
+    {
+        StrBuff sb_ = StrBuff();
+        char *temp_buff = new char[sizeof(size_t)];
+        serialize_size_t(key->home, temp_buff);
+        sb_.c(temp_buff, sizeof(size_t));
+        delete[] temp_buff;
+
+        temp_buff = new char[key->name->size()];
+        serialize_String(key->name, temp_buff);
+        sb_.c(temp_buff, key->name->size());
+        delete[] temp_buff;
+
+        temp_buff = new char[1];
+        temp_buff[0] = '\t';
+        sb_.c(temp_buff, 1);
+
+        String *temp_ = sb_.get();
+        buffer = temp_->steal();
+        delete temp_;
+    }
+
     Key *deserialize_key(char *key_buffer)
     {
         char *temp_buffer = new char[sizeof(size_t)];
         for (int i = 0; i < sizeof(size_t); i++)
         {
-            temp_buffer[i] = serialized[i];
+            temp_buffer[i] = key_buffer[i];
         }
 
-        home = deserialize_size_t(temp_buffer);
+        size_t home = deserialize_size_t(temp_buffer);
         delete[] temp_buffer;
 
         StrBuff sb_ = StrBuff();
 
         int i = sizeof(size_t);
         temp_buffer = new char[1];
-        while (serialized[i] != '\t')
+        while (key_buffer[i] != '\t')
         {
-            temp_buffer[0] = serialized[i];
+            temp_buffer[0] = key_buffer[i];
             sb_.c(temp_buffer, 1);
             i++;
         }
 
-        name = sb_.get();
-        return new Key(name, home)
+        String *name = sb_.get();
+        return new Key(name, home);
     }
 
     void serialize_size_t(size_t val, char *buffer)

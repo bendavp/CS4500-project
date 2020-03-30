@@ -18,6 +18,8 @@ public:
     PseudoNetwork *network_;
     kvstore *kvstore;
     size_t index_;
+    Lock lock_;
+    Reply *reply_;
 
     Node(PseudoNetwork *network)
     {
@@ -28,34 +30,46 @@ public:
 
     void run()
     {
-        Message *m;
         while (true)
         {
-            m = network_->recv_m();
-            if (!m) // if the message is null, then node sleeps/waits to get the next message from queue
+            // talks to network and receives msg
+            Message *m = network_->recv_m();
+            if (m->kind_ == MsgKind::Reply)
             {
-                sleep(1500);
+                reply_ = dynamic_cast<Reply *>(m); // notifies
+                lock_.notify_all();
             }
-            else // the message is not null, we process it
+            else if (m->kind_ == MsgKind::Get)
             {
-                processMessage(m);
+                Get *getMsg = dynamic_cast<Get *>(m);
+                Value *v = kvstore->get(getMsg->key_);
+                Reply *reMsg = new Reply(index_, getMsg->sender_, v);
+                network_->send_m(reMsg);
+                delete getMsg;
             }
-            delete m;
+            else if (m->kind_ == MsgKind::WaitAndGet)
+            {
+                WaitAndGet *wagMsg = dynamic_cast<WaitAndGet *>(m);
+                Value *v = kvstore->WaitAndGet(wagMsg->key_);
+                Reply *reMsg = new Reply(index_, wagMsg->sender_, v);
+                network_->send_m(reMsg);
+                delete wagMsg;
+            }
+            else if (m->kind_ == MsgKind::Put)
+            {
+                Put *putMsg = dynamic_cast<Put *>(m);
+                add(putMsg->key_, putMsg->val_);
+                delete putMsg;
+            }
+            else if (m->kind_ == MsgKind::Kill)
+            {
+                join();
+            }
         }
     }
 
-    void processMessage(Message *m)
+    void add(Key *key, Value *val)
     {
-        if (m->kind_ == MsgKind::Put)
-        {
-            add(m->key, m->df);
-        }
-        else if ()
-    }
-
-    void add(Key *key, DataFrame *df)
-    {
-        Value *val = new Value(df);
         if (key->home != index_)
         {
             // send a message to the network for the specified node (by the Key) to store this Key/Val pair in its KV-store
@@ -65,30 +79,42 @@ public:
         else
         {
             assert(!kvstore->has(key));
-            kvstore->put(key, val);
+            kvstore->add(key, val);
         }
     }
 
-    DataFrame *get(Key *key)
+    Value *get(Key *key)
     {
         if (key->home != index_)
         {
-            // send message to network for the specified node to get the Value from this key
-            network_->send_m(new Get(index_, key));
+            // get the key from the right node
+            // send message (give me value for key)
+            network_->send_m(new Get(0, key));
+            lock_.wait();
+            Reply *r_msg = reply_;  // returns a reply message
+            Value *v = r_msg->val_; // gets the val from msg
+            // DataFrame *df = v->decode_df();
+            delete r_msg;
+            return v;
         }
         // this is the correct node for the key
         else
         {
-            return kvstore->get(key)->decode();
+            return kvstore->get(key);
         }
     }
 
-    DataFrame *waitAndGet(Key *key)
+    Value *waitAndGet(Key *key)
     {
         if (key->home != index_)
         {
             // send message to network for the specified node to get the Value from this key
             network_->send_m(new WaitAndGet(index_, key));
+            lock_.wait();
+            Reply *r_msg = reply_;  // returns a reply message
+            Value *v = r_msg->val_; // gets the val from msg
+            delete r_msg;
+            return v;
         }
         // this is the correct node for the key
         else
@@ -98,7 +124,7 @@ public:
             {
                 sleep(5000);
             }
-            return kvstore->get(key)->decode();
+            return kvstore->get(key);
         }
     }
 };

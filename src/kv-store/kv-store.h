@@ -15,7 +15,7 @@ public:
      * @param key 
      * @return Value* 
      */
-    Value *getAndWait(Key *key)
+    Value *WaitAndGet(Key *key)
     {
         assert(key != nullptr);
         return nullptr;

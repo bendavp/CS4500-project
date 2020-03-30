@@ -23,6 +23,12 @@ public:
         vk = ValueKind::Unassigned;
     }
 
+    Value(ValueKind vk_, char *serialized) : Object()
+    {
+        vk = vk_;
+        serialized_ = serialized;
+    }
+
     Value(DataFrame *df) : Value()
     {
         encode(df);
@@ -42,10 +48,11 @@ public:
         vk = ValueKind::Keys;
 
         StrBuff builder = StrBuff();
+        Serializer serializer_ = Serializer();
 
         // storing size of the key array
         char *buffer = new char[sizeof(size_t)];
-        serializer_.serialize_size_t(col, buffer);
+        serializer_.serialize_size_t(numKeys, buffer);
         builder.c(buffer, sizeof(size_t));
         delete[] buffer;
 
@@ -54,12 +61,15 @@ public:
         sep_[0] = sep;
         for (size_t i = 0; i < numKeys; i++)
         {
-            builder.c(keys[i]->encode(), keys[i]->name->size() + 4);
+            size_t size_ = keys[i]->name->size() + 1 + sizeof(size_t);
+            buffer = new char[size_];
+            serializer_.serialize_key(keys[i], buffer);
+            builder.c(buffer, size_);
+            delete[] buffer;
         }
         String *encodedStr = builder.get();
         serialized_ = encodedStr->steal();
         delete encodedStr;
-        delete header;
     }
 
     /**
@@ -175,28 +185,27 @@ public:
             current++;
         }
         size_t numKeys = serializer_.deserialize_size_t(buffer);
-        delete buffer;
+        delete[] buffer;
 
-        Key **keys = new Key[numKeys];
+        Key **keys = new Key *[numKeys];
         StrBuff sb_ = StrBuff();
         char *toAdd = new char[1];
         String *temp;
-        char *buffer;
         for (size_t i = 0; i < numKeys; i++)
         {
             while (serialized_[current] != '\t')
             {
-                toAdd[0] = serialized[current];
+                toAdd[0] = serialized_[current];
                 sb_.c(toAdd, 1);
                 current++;
             }
-            toAdd[0] = serialized[current]; // reappends the /t needed for deserialization of key
+            toAdd[0] = serialized_[current]; // reappends the /t needed for deserialization of key
             sb_.c(toAdd, 1);
             temp = sb_.get();
             buffer = temp->steal();
             delete temp;
             keys[i] = serializer_.deserialize_key(buffer); // deserializing and adding the key to the array
-            delete buffer;
+            delete[] buffer;
         }
     }
 
@@ -351,7 +360,7 @@ public:
 
     bool equals(Object *other)
     {
-        Value<T> *other_val = dynamic_cast<Value<T> *>(other);
+        Value *other_val = dynamic_cast<Value *>(other);
         if (other_val == nullptr)
             return false;
         if (other_val->serialized_ == nullptr)
@@ -372,5 +381,14 @@ public:
     size_t hash()
     {
         return String(serialized_).hash();
+    }
+
+    Value *clone()
+    {
+        size_t size = strlen(serialized_);
+        char *temp_ = new char[size];
+        memcpy(temp_, serialized_, size);
+        Value *res = new Value(vk, temp_);
+        return res;
     }
 };

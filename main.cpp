@@ -26,17 +26,17 @@ void tooManyCmdsError()
     exit(1);
 }
 
-namespace
-{
-//! The supported commands that can be run from the command line arguments
-enum class SoRCLI
-{
-    UNKNOWN,
-    PRINTCOLTYPE,
-    PRINTCOLIDX,
-    ISMISSINGIDX
-};
-} // namespace
+// namespace
+// {
+// //! The supported commands that can be run from the command line arguments
+// enum class SoRCLI
+// {
+//     UNKNOWN,
+//     PRINTCOLTYPE,
+//     PRINTCOLIDX,
+//     ISMISSINGIDX
+// };
+// } // namespace
 
 int main(int argc, char *argv[])
 {
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     Opt opt;
 
     optParser.addFlag("f", 1);
-    optParser.addFlag("num_nodes", 1);
+    optParser.addFlag("n", 1);
 
     SoRParser sorParser;
     std::vector<std::string> cmdArgs;
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
         {
             filename = optVals.front();
         }
-        if (flag == "num_nodes")
+        else if (flag == "n")
         {
             num_nodes = stoi(optVals.front());
         }
@@ -79,15 +79,6 @@ int main(int argc, char *argv[])
     {
         std::cout << "Unable to open file " << filename << std::endl;
         exit(1);
-    }
-
-    assert(num_nodes > 0);
-
-    if (num_nodes != 1)
-    {
-        for (size_t i = 0; i < num_nodes; i++)
-        {
-                }
     }
 
     // getting total row number
@@ -158,10 +149,6 @@ int main(int argc, char *argv[])
             }
         }
         df->add_row(*r);
-
-        if (df->nrows() == 100000)
-        {
-        }
     }
 
     delete r;
