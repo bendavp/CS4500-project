@@ -6,6 +6,64 @@
 
 using namespace std;
 
+class Array : public Object
+{
+public:
+    size_t capacity_;
+    size_t size_;
+    Object **objs;
+
+    Array(size_t i)
+    {
+        Object **objs = new Object *[i];
+        capacity_ = i;
+        size_ = 0;
+    }
+    void push_back(Object *o)
+    {
+        assert(size_ + 1 <= capacity_);
+        objs[size_] = o;
+        size_++;
+    }
+    Object *get_(size_t idx)
+    {
+        assert(idx < size_);
+        return objs[idx];
+    }
+    size_t size()
+    {
+        return size_;
+    }
+    void put(size_t idx, Object *o)
+    {
+        objs[idx] = o;
+    }
+    // shifts all elements after erased downwards
+    void erase_(size_t idx)
+    {
+        assert(idx < size_);
+        Object **temp = new Object *[capacity_];
+        bool removed = false;
+        for (size_t i = 0; i < size_; i++)
+        {
+            if (i == idx)
+            {
+                removed = true;
+            }
+            else if (removed)
+            {
+                temp[i - 1] = objs[i];
+            }
+            else
+            {
+                temp[i] = objs[i];
+            }
+        }
+        delete[] objs;
+        objs = temp;
+    }
+};
+
 /**
  * @brief A class that represents an array of pointers to arrays of integers. This allows us to grow the array 
  * more efficiently and without copying the entire payload. Instead, we copy pointers to the arrays containing the payload 

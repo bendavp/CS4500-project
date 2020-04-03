@@ -7,16 +7,19 @@
 #include "src/adapter/StrConverter.h"
 #include "src/dataframe/dataframe.h"
 #include "src/network/node.h"
+#include "src/adapter/arg.h"
 
-void badArgError(const std::string &arg)
+extern Arg arg;
+
+void badArgError(const std::string &arg_)
 {
-    std::cout << "Invalid argument " << arg << " provided" << std::endl;
+    std::cout << "Invalid argument " << arg_ << " provided" << std::endl;
     exit(1);
 }
 
-void missingArgError(const char *arg)
+void missingArgError(const char *arg_)
 {
-    std::cout << "Missing argument " << arg << std::endl;
+    std::cout << "Missing argument " << arg_ << std::endl;
     exit(1);
 }
 
@@ -156,6 +159,9 @@ int main(int argc, char *argv[])
     RowPrinter rp = RowPrinter();
 
     df->map(rp);
+
+    //*******************************************************************
+    arg = Arg(num_nodes, filename.c_str()); // somewhere above when we process the flags, we SHOULD store it into variables to pass it here
 
     return 0;
 }

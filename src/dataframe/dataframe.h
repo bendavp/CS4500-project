@@ -300,6 +300,7 @@ public:
 
 class kvstore;
 class Key;
+class Writer;
 
 /****************************************************************************
  * @brief DataFrame::
@@ -590,6 +591,16 @@ public:
         }
     }
 
+    void local_map(Reader &r)
+    {
+        Row row_ = Row(get_schema());
+        for (size_t i = 0; i < nrows_; i++)
+        {
+            fill_row(i, row_);
+            r.visit(row_);
+        }
+    }
+
     /** This method clones the Rower and executes the map in parallel. Join is
     * used at the end to merge the results. */
     void pmap(Rower &r)
@@ -660,6 +671,8 @@ public:
     static DataFrame *fromArray(Key *key, kvstore *kv, size_t sz, float *vals);
 
     static DataFrame *fromScalar(Key *key, kvstore *kv, float sum);
+
+    static DataFrame *fromVisitor(Key *key, kvstore *kv, char *schema, Writer &w);
 };
 
 void RowThread::run()

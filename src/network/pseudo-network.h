@@ -68,7 +68,6 @@ class PseudoNetwork : public Object
 public:
     StringSztMap threads_;
     FastArray<MessageQueue> qs_;
-    size_t current_node_idx;
 
     PseudoNetwork(size_t num_threads) : Object()
     {
@@ -76,7 +75,6 @@ public:
         {
             qs_.push_back(new MessageQueue());
         }
-        current_node_idx = -1;
     }
 
     /**
@@ -84,18 +82,10 @@ public:
      * 
      * @param idx 
      */
-    void register_node()
+    void register_node(size_t idx)
     {
-        current_node_idx++;
-        assert(current_node_idx <= qs_.size());
-        size_t idx = current_node_idx;
         String *tid = Thread::thread_id();
         threads_.put(tid, idx);
-    }
-
-    size_t check_next_node()
-    {
-        return current_node_idx + 1;
     }
 
     /**
