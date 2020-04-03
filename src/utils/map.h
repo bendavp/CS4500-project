@@ -38,6 +38,14 @@ public:
     size_ = 0;
   }
 
+  OPMap<T, U>(OPMap<T, U> &map) : Object()
+  {
+    memory_size_ = map.memory_size_;
+    key_arr_ = map.key_arr_;
+    val_arr_ = map.val_arr_;
+    size_ = map.size_;
+  }
+
   ~OPMap()
   {
     delete key_arr_;
@@ -235,17 +243,35 @@ public:
    * Store keys in the given array. Caller responsible for allocating at least
    * Map::size() elements.
    */
-  void keys(T **dest)
+  void keys(FastArray<T> *dest)
   {
     assert(dest != nullptr);
 
-    size_t destIndex = 0;
     for (size_t i = 0; i < memory_size_; i++)
     {
       if (key_arr_[i] != nullptr)
       {
-        dest[destIndex] = key_arr_[i];
-        destIndex++;
+        dest->push_back(key_arr_[i]);
+      }
+    }
+  }
+
+  void merge(OPMap<T, U> *other_map)
+  {
+    FastArray<T> *other_keys = new FastArray<T>();
+    other_map->keys(other_keys);
+
+    T *curr;
+    for (int i = 0; i < other_keys->size(); i++)
+    {
+      curr = other_keys->get(i);
+      if (has(curr))
+      {
+        set(curr, get(curr) + other_map->get(curr));
+      }
+      else
+      {
+        add(curr, other_map->get(curr));
       }
     }
   }

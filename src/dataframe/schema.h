@@ -3,12 +3,15 @@
 #include "column.h"
 
 #pragma once
+
 /*************************************************************************
- * Schema::
+ * @brief Schema::
  * A schema is a description of the contents of a data frame, the schema
  * knows the number of columns and number of rows, the type of each column,
  * optionally columns and rows can be named by strings.
  * The valid types are represented by the chars 'S', 'B', 'I' and 'F'.
+ * 
+ * @author BK and AT
  */
 class Schema : public Object
 {

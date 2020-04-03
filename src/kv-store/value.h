@@ -1,5 +1,6 @@
 #include "../dataframe/dataframe.h"
 #include "serializer.h"
+#include "../utils/array.h"
 
 #pragma once
 
@@ -34,12 +35,12 @@ public:
         encode(df);
     }
 
-    Value(Key **keys, size_t sz) : Value()
+    Value(FastArray<Key> *keys, size_t sz) : Value()
     {
-        encode(keys, sz);
+        encode(keys);
     }
 
-    void encode(Key **keys, size_t numKeys)
+    void encode(FastArray<Key> *keys)
     {
         assert(serialized_ == nullptr);
         assert(vk == ValueKind::Unassigned);
@@ -52,18 +53,18 @@ public:
 
         // storing size of the key array
         char *buffer = new char[sizeof(size_t)];
-        serializer_.serialize_size_t(numKeys, buffer);
+        serializer_.serialize_size_t(keys->size(), buffer);
         builder.c(buffer, sizeof(size_t));
         delete[] buffer;
 
         // encoding the keys
         char *sep_ = new char[1];
         sep_[0] = sep;
-        for (size_t i = 0; i < numKeys; i++)
+        for (size_t i = 0; i < keys->size(); i++)
         {
-            size_t size_ = keys[i]->name->size() + 1 + sizeof(size_t);
+            size_t size_ = keys->get(i)->name->size() + 1 + sizeof(size_t);
             buffer = new char[size_];
-            serializer_.serialize_key(keys[i], buffer);
+            serializer_.serialize_key(keys->get(i), buffer);
             builder.c(buffer, size_);
             delete[] buffer;
         }
@@ -172,7 +173,7 @@ public:
         delete schema_coltypes;
     }
 
-    Key **decode_keys()
+    FastArray<Key> *decode_keys()
     {
         assert(serialized_ != nullptr);
         Serializer serializer_ = Serializer();
@@ -187,7 +188,7 @@ public:
         size_t numKeys = serializer_.deserialize_size_t(buffer);
         delete[] buffer;
 
-        Key **keys = new Key *[numKeys];
+        FastArray<Key> *keys = new FastArray<Key>;
         StrBuff sb_ = StrBuff();
         char *toAdd = new char[1];
         String *temp;
@@ -204,7 +205,7 @@ public:
             temp = sb_.get();
             buffer = temp->steal();
             delete temp;
-            keys[i] = serializer_.deserialize_key(buffer); // deserializing and adding the key to the array
+            keys->push_back(serializer_.deserialize_key(buffer)); // deserializing and adding the key to the array
             delete[] buffer;
         }
     }

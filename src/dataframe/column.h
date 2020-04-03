@@ -9,12 +9,14 @@ class BoolColumn;
 class FloatColumn;
 class StringColumn;
 
-/**************************************************************************
- * Column ::
- * Represents one column of a data frame which holds values of a single type.
+/**
+ * @brief Represents one column of a data frame which holds values of a single type.
  * This abstract class defines methods overriden in subclasses. There is
  * one subclass per element type. Columns are mutable, equality is pointer
- * equality. */
+ * equality.
+ * 
+ * @author BK + AT
+ */
 class Column : public Object
 {
 public:
@@ -72,10 +74,10 @@ public:
     virtual size_t hash_me() { return 0; }
 };
 
-/*************************************************************************/
 /**
- * BoolColumn::
- * Holds int values.
+ * @brief BoolColumn -- holds boolean values
+ * 
+ * @author BK and AT
  */
 class BoolColumn : public Column
 {
@@ -146,9 +148,10 @@ public:
     }
 };
 
-/*************************************************************************
- * IntColumn::
- * Holds int values.
+/**
+ * @brief IntColumn:: Holds int values.
+ * 
+ * @author BK and AT
  */
 class IntColumn : public Column
 {
@@ -218,9 +221,10 @@ public:
     }
 };
 
-/*************************************************************************
- * FloatColumn::
- * Holds float values.
+/**
+ * @brief FloatColumn:: Holds float values.
+ * 
+ * @author BK and AT
  */
 class FloatColumn : public Column
 {
@@ -291,10 +295,11 @@ public:
     }
 };
 
-/*************************************************************************
- * StringColumn::
- * Holds string pointers. The strings are external.  Nullptr is a valid
+/**
+ * @brief StringColumn:: Holds string pointers. The strings are external.  Nullptr is a valid
  * value.
+ * 
+ * @author BK and AT
  */
 class StringColumn : public Column
 {

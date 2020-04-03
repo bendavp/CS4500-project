@@ -5,8 +5,13 @@
 
 #pragma once
 
+/**
+ * @author BK and AT
+ * 
+ */
+
 /*****************************************************************************
- * Fielder::
+ * @brief Fielder::
  * A field vistor invoked by Row. 
  * 
  * Here for testing purposes -- see Printer
@@ -72,7 +77,7 @@ public:
 };
 
 /*************************************************************************
- * Row::
+ * @brief Row::
  *
  * This class represents a single row of data constructed according to a
  * dataframe's schema. The purpose of this class is to make it easier to add
@@ -205,10 +210,12 @@ public:
 };
 
 /*******************************************************************************
- *  Rower::
+ *  @brief Rower::
  *  An interface for iterating through each row of a data frame. The intent
  *  is that this class should subclassed and the accept() method be given
  *  a meaningful implementation. Rowers can be cloned for parallel execution.
+ * 
+ *  @author BK and AT
  */
 class Rower : public Object
 {
@@ -259,10 +266,12 @@ public:
 };
 
 /****************************************************************************
- * RowThread::
+ * @brief RowThread::
  * 
  * RowThread is a thread that can take a Rower and iterate through "some" of the rows
  * in the given Dataframe.
+ * 
+ * @author BK and AT
  */
 
 // forward declaration so RowThread can "use" DataFrame's fill_row()
@@ -293,11 +302,13 @@ class kvstore;
 class Key;
 
 /****************************************************************************
- * DataFrame::
+ * @brief DataFrame::
  *
  * A DataFrame is table composed of columns of equal length. Each column
  * holds values of the same type (I, S, B, F). A dataframe has a schema that
  * describes it.
+ * 
+ * @author BK and AT
  */
 class DataFrame
 {

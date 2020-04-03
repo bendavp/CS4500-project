@@ -174,6 +174,11 @@ public:
     }
 };
 
+/**
+ * @brief Message to kill the node
+ * 
+ * @author BK and AT
+ */
 class Kill : public Message
 {
 public:
