@@ -2,6 +2,7 @@
 
 #include "schema.h"
 #include "../utils/thread.h"
+#include "../app/reader-writer.h"
 
 #pragma once
 
@@ -300,7 +301,7 @@ public:
 
 class kvstore;
 class Key;
-class Writer;
+class PseudoNetwork;
 
 /****************************************************************************
  * @brief DataFrame::
@@ -672,7 +673,7 @@ public:
 
     static DataFrame *fromScalar(Key *key, kvstore *kv, float sum);
 
-    static DataFrame *fromVisitor(Key *key, kvstore *kv, char *schema, Writer &w);
+    static DataFrame *fromVisitor(Key *key, kvstore *kvstore, const char *schema, Writer &w);
 };
 
 void RowThread::run()

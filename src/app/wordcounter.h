@@ -5,6 +5,7 @@
 #include "../utils/jv-map.h"
 #include "application.h"
 #include "../adapter/arg.h"
+#include "../kv-store/kv-store.h"
 
 extern Arg arg;
 
@@ -201,7 +202,7 @@ public:
     KeyBuff kbuf;
     SIMap all;
 
-    WordCount(size_t idx, PseudoNetwork &net) : Application(idx, &net), in(new String("data")), kbuf(new Key(new String("wc-map-"), 0)) {}
+    WordCount(size_t idx, Node *node) : Application(idx, node), in(new String("data")), kbuf(new Key(new String("wc-map-"), 0)) {}
 
     /** The master nodes reads the input, then all of the nodes count. */
     void run() override
@@ -209,7 +210,7 @@ public:
         if (idx_ == 0)
         {
             FileReader fr;
-            delete DataFrame::fromVisitor(&in, kvstore, "S", fr);
+            delete DataFrame::fromVisitor(&in, node_->kvstore, "S", fr);
         }
         local_count();
         reduce();
@@ -227,14 +228,14 @@ public:
     /** Compute word counts on the local node and build a data frame. */
     void local_count()
     {
-        DataFrame *words = waitAndGet(&in)->decode_df();
+        DataFrame *words = node_->waitAndGet(&in)->decode_df();
         p("Node ").p(idx_).pln(": starting local count...");
         SIMap map;
         Adder add(map);
         words->local_map(add);
         delete words;
         Summer cnt(map);
-        delete DataFrame::fromVisitor(mk_key(idx_), kvstore, "SI", cnt);
+        delete DataFrame::fromVisitor(mk_key(idx_), node_->kvstore, "SI", cnt);
     }
 
     /** Merge the data frames of all nodes */
@@ -245,11 +246,11 @@ public:
         pln("Node 0: reducing counts...");
         SIMap map;
         Key *own = mk_key(0);
-        merge(kvstore->get(own)->decode_df(), map);
+        merge(node_->kvstore->get(own)->decode_df(), map);
         for (size_t i = 1; i < arg.num_nodes; ++i)
         { // merge other nodes
             Key *ok = mk_key(i);
-            merge(waitAndGet(ok)->decode_df(), map);
+            merge(node_->waitAndGet(ok)->decode_df(), map);
             delete ok;
         }
         p("Different words: ").pln(map.size());

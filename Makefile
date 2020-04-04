@@ -1,12 +1,10 @@
-
-HDRS := $(wildcard src/adapter/*.h)
-SRCS := $(wildcard src/adapter/*.cpp) main.cpp
+SRCS := src/main.cpp
 
 .PHONY: clean docker run build valgrind
 
 CXX_FLAGS := -g -Wall -std=c++17 -O3 -Iinclude
 
-eau2: $(SRCS) $(HDRS)
+eau2: $(SRCS)
 	g++ $(CXX_FLAGS) $(SRCS) -o eau2
 
 dataframe: 
@@ -20,7 +18,7 @@ build:
 	docker run -ti -v "`pwd`":/data eau2:0.1 bash -c "cd /data; make eau2"
 
 run: eau2
-	./eau2 -f data/test.sor
+	./eau2 -f data/100k.txt -n 2
 
 docker: run
 

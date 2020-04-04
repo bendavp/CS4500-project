@@ -3,8 +3,15 @@
 #include "../utils/thread.h"
 #include "../network/node.h"
 
-class Application : public Node
+class Application : public Thread
 {
 public:
-    Application(size_t idx, PseudoNetwork *network) : Node(idx, network) {}
+    size_t idx_;
+    Node *node_;
+
+    Application(size_t idx, Node *node) : Thread()
+    {
+        idx_ = idx;
+        node_ = node;
+    }
 };

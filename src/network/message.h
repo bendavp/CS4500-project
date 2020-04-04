@@ -52,7 +52,7 @@ public:
 
     size_t target_; // the index of the receiver node
 
-    virtual Message *clone();
+    virtual Message *clone() = 0;
 };
 
 /**

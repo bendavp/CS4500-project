@@ -36,3 +36,21 @@ DataFrame *DataFrame::fromScalar(Key *key, kvstore *kv, float sum)
     kv->add(key, new Value(df));
     return df;
 }
+
+DataFrame *DataFrame::fromVisitor(Key *key, kvstore *kvstore, const char *schema, Writer &w)
+{
+    Schema scm(schema);
+    DataFrame *df = new DataFrame(scm);
+
+    Row r = Row(scm);
+    while (!w.done())
+    {
+        w.visit(r);
+        df->add_row(r);
+    }
+
+    Value *v = new Value(df);
+    kvstore->add(key, v);
+
+    return df;
+}

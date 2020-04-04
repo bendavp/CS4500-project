@@ -15,7 +15,7 @@ public:
 
     Array(size_t i)
     {
-        Object **objs = new Object *[i];
+        objs = new Object *[i];
         capacity_ = i;
         size_ = 0;
     }
