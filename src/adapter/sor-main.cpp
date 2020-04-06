@@ -2,12 +2,12 @@
 #include <string>
 #include <vector>
 
-#include "src/adapter/OptParser.h"
-#include "src/adapter/SoRParser.h"
-#include "src/adapter/StrConverter.h"
-#include "src/dataframe/dataframe.h"
-#include "src/network/node.h"
-#include "src/adapter/arg.h"
+#include "OptParser.h"
+#include "SoRParser.h"
+#include "StrConverter.h"
+#include "../dataframe/dataframe.h"
+#include "../network/node.h"
+#include "arg.h"
 
 extern Arg arg;
 
@@ -159,9 +159,6 @@ int main(int argc, char *argv[])
     RowPrinter rp = RowPrinter();
 
     df->map(rp);
-
-    //*******************************************************************
-    arg = Arg(num_nodes, filename.c_str()); // somewhere above when we process the flags, we SHOULD store it into variables to pass it here
 
     return 0;
 }

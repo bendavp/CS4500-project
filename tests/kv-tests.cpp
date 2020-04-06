@@ -14,7 +14,7 @@ void test_get()
     Key *key = new Key();
     Value *value = new Value();
 
-    map->put(key, value);
+    map->add(key, value);
 
     Value *v = map->get(key);
 
@@ -40,7 +40,7 @@ void test_remove()
     Key *key = new Key();
     Value *value = new Value();
 
-    map->put(key, value);
+    map->add(key, value);
 
     map->remove(key);
 
@@ -54,7 +54,7 @@ void test_has()
     Key *key = new Key();
     Value *value = new Value();
 
-    map->put(key, value);
+    map->add(key, value);
 
     assert(map->has(key));
 
@@ -77,8 +77,8 @@ void test_clear()
     Schema *scm = new Schema();
     Value *value2 = new Value(new DataFrame(*scm));
 
-    map->put(key1, value1);
-    map->put(key2, value2);
+    map->add(key1, value1);
+    map->add(key2, value2);
 
     map->clear();
 
@@ -99,7 +99,7 @@ void test_size()
     Key *key = new Key();
     Value *value = new Value();
 
-    map->put(key, value);
+    map->add(key, value);
 
     assert(map->size() == 1);
 
@@ -118,8 +118,8 @@ void test_keys()
     Schema *scm = new Schema();
     Value *val2 = new Value(new DataFrame(*scm));
 
-    map->put(key1, val1);
-    map->put(key2, val2);
+    map->add(key1, val1);
+    map->add(key2, val2);
 
     Key **keys = new Key *[2];
 
@@ -137,7 +137,7 @@ void test_overwrite()
     Key *key = new Key();
     Value *val = new Value();
 
-    map->put(key, val);
+    map->add(key, val);
 
     Value *v = map->get(key);
 
@@ -176,7 +176,7 @@ void test_rehash()
 
     for (int i = 0; i < 9; i++)
     {
-        map->put(keys[i], val);
+        map->add(keys[i], val);
     }
 
     assert(map->size() == 9);
@@ -332,7 +332,7 @@ void testSimpleDataFrameIBFS()
     Value *v = new Value();
     v->encode(df);
 
-    DataFrame *df2 = v->decode();
+    DataFrame *df2 = v->decode_df();
     // printing deserialized DataFrame
     std::cout << "deserialized dataframe" << std::endl;
     df2->print();
@@ -361,23 +361,26 @@ void testSimpleDataFrameIBFSBS()
     Value *v = new Value();
     v->encode(df);
 
-    DataFrame *df2 = v->decode();
+    DataFrame *df2 = v->decode_df();
     // printing deserialized DataFrame
     std::cout << "deserialized dataframe" << std::endl;
     df2->print();
 }
 
-void testSerializeKey()
-{
-    Key *before = new Key(new String("hello"), 1);
-    char *encoded_key1 = before->encode();
-    Key *after = new Key(encoded_key1);
+// void testSerializeKey()
+// {
+//     Key *before = new Key(new String("hello"), 1);
+//     Serializer s_ = Serializer();
+//     size_t sz = before->name->size() + sizeof(size_t) + 1;
+//     char *encoded_key = new char[sz];
+//     s_.serialize_key(before, encoded_key);
+//     Key *after = s_.deserialize_key(encoded_key);
 
-    std::cout << "before: home: " << before->home << " name: " << before->name->c_str() << std::endl;
-    std::cout << "after: home: " << after->home << " name: " << after->name->c_str() << std::endl;
+//     std::cout << "before: home: " << before->home << " name: " << before->name->c_str() << std::endl;
+//     std::cout << "after: home: " << after->home << " name: " << after->name->c_str() << std::endl;
 
-    assert(before->equals(after));
-}
+//     assert(before->equals(after));
+// }
 
 void testTrivialApplication()
 {
@@ -390,7 +393,7 @@ void testTrivialApplication()
     kvstore *kv = new kvstore();
     DataFrame *df = DataFrame::fromArray(key, kv, SZ, vals);
     assert(df->get_float(0, 1) == 1);
-    DataFrame *df2 = kv->get(key)->decode();
+    DataFrame *df2 = kv->get(key)->decode_df();
     for (size_t i = 0; i < SZ; ++i)
         sum -= df2->get_float(0, i);
     assert(sum == 0);
@@ -414,7 +417,7 @@ int main()
     testSerializerStringArray();
     testSimpleDataFrameIBFS();
     testSimpleDataFrameIBFSBS();
-    testSerializeKey();
+    // testSerializeKey();
 
     testTrivialApplication();
 

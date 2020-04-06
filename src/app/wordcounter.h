@@ -4,10 +4,7 @@
 #include "reader-writer.h"
 #include "../utils/jv-map.h"
 #include "application.h"
-#include "../adapter/arg.h"
 #include "../kv-store/kv-store.h"
-
-extern Arg arg;
 
 class FileReader : public Writer
 {

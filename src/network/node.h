@@ -24,12 +24,12 @@ public:
     Node(size_t idx, PseudoNetwork *network)
     {
         network_ = network;
-        network_->register_node(idx);
         idx_ = idx;
     }
 
     void run()
     {
+        network_->register_node(idx_);
         while (true)
         {
             // talks to network and receives msg
