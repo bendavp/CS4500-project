@@ -2,7 +2,7 @@ SRCS := src/main.cpp
 
 .PHONY: clean docker run build valgrind
 
-CXX_FLAGS := -g -Wall -std=c++17 -O3 -Iinclude
+CXX_FLAGS := -g -Wall -std=c++17 -O3 -Iinclude -pthread
 
 eau2: $(SRCS)
 	g++ $(CXX_FLAGS) $(SRCS) -o eau2

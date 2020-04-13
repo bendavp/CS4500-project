@@ -7,48 +7,26 @@
  **/
 
 /**
- * @brief Tests if we can actually pass va_list into a constructor as the literal va_list.
- * This is because all Columns take a va_list and pass it into the FastArray constructors
- * 
- * Jan wasn't sure if this would actually work so we decided to test it out!
- */
-void doesVaListActuallyWork()
-{
-    IntFastArray *i = new IntFastArray(5, 1, 2, 3, 4, 5);
-    BoolFastArray *b = new BoolFastArray(2, true, false);
-    FloatFastArray *f = new FloatFastArray(4, 4.20, 4.20, 4.20, 4.20);
-    StringFastArray *s = new StringFastArray(2, new String("hello"), new String("world"));
-
-    IntColumn *ic = new IntColumn(5, 1, 2, 3, 4, 5);
-    BoolColumn *bc = new BoolColumn(2, true, false);
-    FloatColumn *fc = new FloatColumn(4, 4.20, 4.20, 4.20, 4.20);
-    StringColumn *sc = new StringColumn(2, new String("hello"), new String("world"));
-
-    assert(i->equals(ic->arr_));
-    assert(b->equals(bc->arr_));
-    assert(f->equals(fc->arr_));
-    assert(s->equals(sc->arr_));
-
-    delete i;
-    delete b;
-    delete f;
-    delete s;
-    delete ic;
-    delete bc;
-    delete fc;
-    delete sc;
-}
-
-/**
  * @brief Tests the get() function in all FastArrays
  * 
  */
 void testGet()
 {
-    IntFastArray *i = new IntFastArray(5, 1, 2, 3, 4, 5);
-    BoolFastArray *b = new BoolFastArray(2, true, false);
-    FloatFastArray *f = new FloatFastArray(4, 4.20, 4.20, 4.20, 4.20);
-    StringFastArray *s = new StringFastArray(2, new String("hello"), new String("world"));
+    FastArray<int> *i = new FastArray<int>();
+    FastArray<float> *f = new FastArray<float>();
+    for (int i_ = 1; i_ < 6; i_++)
+    {
+        i->push_back(i_);
+        f->push_back(4.20);
+    }
+
+    FastArray<bool> *b = new FastArray<bool>();
+    b->push_back(true);
+    b->push_back(false);
+
+    FastArray<String *> *s = new FastArray<String *>();
+    s->push_back(new String("hello"));
+    s->push_back(new String("world"));
 
     assert(i->get(0) == 1);
     assert(i->get(4) == 5);
@@ -66,10 +44,21 @@ void testGet()
  */
 void testSet()
 {
-    IntFastArray *i = new IntFastArray(5, 1, 2, 3, 4, 5);
-    BoolFastArray *b = new BoolFastArray(2, true, false);
-    FloatFastArray *f = new FloatFastArray(4, 4.20, 4.20, 4.20, 4.20);
-    StringFastArray *s = new StringFastArray(2, new String("hello"), new String("world"));
+    FastArray<int> *i = new FastArray<int>();
+    FastArray<float> *f = new FastArray<float>();
+    for (int i_ = 1; i_ < 6; i_++)
+    {
+        i->push_back(i_);
+        f->push_back(4.20);
+    }
+
+    FastArray<bool> *b = new FastArray<bool>();
+    b->push_back(true);
+    b->push_back(false);
+
+    FastArray<String *> *s = new FastArray<String *>();
+    s->push_back(new String("hello"));
+    s->push_back(new String("world"));
 
     i->set(0, 420);
     i->set(4, 69);
@@ -106,10 +95,21 @@ void testSet()
  */
 void testGrowAndPushBack()
 {
-    IntFastArray *i = new IntFastArray(5, 1, 2, 3, 4, 5);
-    BoolFastArray *b = new BoolFastArray(2, true, false);
-    FloatFastArray *f = new FloatFastArray(4, 4.20, 4.20, 4.20, 4.20);
-    StringFastArray *s = new StringFastArray(2, new String("hello"), new String("world"));
+    FastArray<int> *i = new FastArray<int>();
+    FastArray<float> *f = new FastArray<float>();
+    for (int i_ = 1; i_ < 6; i_++)
+    {
+        i->push_back(i_);
+        f->push_back(4.20);
+    }
+
+    FastArray<bool> *b = new FastArray<bool>();
+    b->push_back(true);
+    b->push_back(false);
+
+    FastArray<String *> *s = new FastArray<String *>();
+    s->push_back(new String("hello"));
+    s->push_back(new String("world"));
 
     for (int j = 0; j < 512; j++)
     {
@@ -126,7 +126,7 @@ void testGrowAndPushBack()
     for (int j = 0; j < 512; j++)
     {
         f->push_back(4.20);
-        assert(f->get(j + 4) - 4.20 < 0.001 && f->get(j + 4) - 4.20 > -.001);
+        assert(f->get(j + 5) - 4.20 < 0.001 && f->get(j + 5) - 4.20 > -.001);
     }
 
     String *str = new String("hello world"); // FastArrays own their contents, so no need to delete this at the end
@@ -153,12 +153,11 @@ void testAddColumn()
     Schema *s = new Schema(s_str->c_str());
 
     assert(s->coltypes_->equals(s_str));
-    s->add_column('S', new String("Lies"));
+    s->add_column('S');
     String *s_str_new = new String("FIBSS");
 
     assert(s->width() == 5);
     assert(s->coltypes_->equals(s_str_new));
-    assert(s->col_name(4)->equals(new String("Lies")));
 }
 
 /**
@@ -172,12 +171,11 @@ void testAddEmptyNameColumn()
     Schema *s = new Schema(s_str->c_str());
 
     assert(s->coltypes_->equals(s_str));
-    s->add_column('S', nullptr);
+    s->add_column('S');
     String *s_str_new = new String("FIBSS");
 
     assert(s->width() == 5);
     assert(s->coltypes_->equals(s_str_new));
-    assert(s->col_name(4) == nullptr);
 }
 
 /**
@@ -189,11 +187,10 @@ void testAddColToEmptySchemaNoName()
 {
     Schema *s = new Schema();
 
-    s->add_column('S', nullptr);
+    s->add_column('S');
 
     assert(s->width() == 1);
     assert(s->coltypes_->equals(new String("S")));
-    assert(s->col_name(0) == nullptr);
 }
 
 /**
@@ -205,153 +202,10 @@ void testAddColToEmptySchema()
 {
     Schema *s = new Schema();
 
-    s->add_column('S', new String("Lies"));
+    s->add_column('S');
 
     assert(s->width() == 1);
     assert(s->coltypes_->equals(new String("S")));
-    assert(s->col_name(0)->equals(new String("Lies")));
-}
-
-/**
- * @brief Testing adding a row with a name to an empty schema via checking that the length of the schema has changed
- * and that the name of the row is as expected.
- * 
- */
-void testAddRowToEmptySchema()
-{
-    Schema *s = new Schema();
-    s->add_row(new String("easepease"));
-    assert(s->length() == 1);
-    assert(s->row_name(0)->equals(new String("easepease")));
-}
-
-/**
- * @brief Testing adding a row without a name to an empty schema via checking that the length of the schema has changed
- * and that the name of the row is as expected.
- * 
- */
-void testAddNullRowToEmptySchema()
-{
-    Schema *s = new Schema();
-    s->add_row(nullptr);
-    assert(s->row_name(0) == nullptr);
-
-    exit(0);
-}
-
-/**
- * @brief Testing adding a row with a name to an nonempty schema via checking that the length of the schema has changed
- * and that the name of the row is as expected.
- * 
- */
-void testAddRowToSchema()
-{
-    String *s_str = new String("FIBS");
-    Schema *s = new Schema(s_str->c_str());
-
-    s->add_row(new String("easepease"));
-
-    assert(s->row_name(0)->equals(new String("easepease")));
-}
-
-/**
- * @brief Testing adding a row without a name to an nonempty schema via checking that the length of the schema has changed
- * and that the name of the row is as expected.
- * 
- */
-void testAddNullRowToSchema()
-{
-    String *s_str = new String("FIBS");
-    Schema *s = new Schema(s_str->c_str());
-
-    s->add_row(nullptr);
-
-    assert(s->row_name(0) == nullptr);
-}
-
-/**
- * @brief Testing getting column indexes on a schema that has no rows but has columns.
- * 
- */
-void testGetColIdxEmptySchema()
-{
-    Schema *s = new Schema();
-
-    s->add_column('B', new String("b"));
-    s->add_column('I', new String("i"));
-    s->add_column('F', new String("f"));
-    s->add_column('S', new String("s"));
-
-    assert(s->width() == 4);
-    assert(s->col_idx("b") == 0);
-    assert(s->col_idx("i") == 1);
-    assert(s->col_idx("f") == 2);
-    assert(s->col_idx("s") == 3);
-    assert(s->col_idx("not existent") == -1);
-}
-
-/**
- * @brief esting getting column indexes on a schema that has no rows but has columns after adding more columns.
- * 
- */
-void testGetColIdx()
-{
-    String *s_str = new String("FIBS");
-    Schema *s = new Schema(s_str->c_str());
-
-    s->add_column('B', new String("b"));
-    s->add_column('I', new String("i"));
-    s->add_column('F', new String("f"));
-    s->add_column('S', new String("s"));
-
-    assert(s->width() == 8);
-    assert(s->col_idx("b") == 4);
-    assert(s->col_idx("i") == 5);
-    assert(s->col_idx("f") == 6);
-    assert(s->col_idx("s") == 7);
-}
-
-/**
- * @brief Testing getting row indexes on a schema with no columns.
- * 
- */
-void testGetRowIdxEmptySchema()
-{
-    Schema *s = new Schema();
-
-    s->add_row(new String("b"));
-    s->add_row(new String("i"));
-    s->add_row(new String("f"));
-    s->add_row(new String("s"));
-
-    assert(s->length() == 4);
-    assert(s->row_idx("b") == 0);
-    assert(s->row_idx("i") == 1);
-    assert(s->row_idx("f") == 2);
-    assert(s->row_idx("s") == 3);
-    assert(s->row_idx("no") == -1);
-}
-
-/**
- * @brief Testing getting row indexes on a schema with columns.
- * 
- */
-void testGetRowIdx()
-{
-    String *s_str = new String("FIBS");
-    Schema *s = new Schema(s_str->c_str());
-
-    s->add_row(new String("b"));
-    s->add_row(new String("i"));
-    s->add_row(new String("f"));
-    s->add_row(new String("s"));
-
-    assert(s->length() == 4);
-    assert(s->row_idx("b") == 0);
-    assert(s->row_idx("i") == 1);
-    assert(s->row_idx("f") == 2);
-    assert(s->row_idx("s") == 3);
-    assert(s->row_idx("blah") == -1);
 }
 
 /********************************************************************************************************************
@@ -405,31 +259,6 @@ void testAcceptEmptyRow()
     delete s;
 }
 
-/**
- * @brief tests Rower's accept() function on a row created from an dataframe based on Schema that has no columns but many rows
- * 
- */
-void testAcceptEmptyRow2()
-{
-    Schema *s = new Schema(); // empty schema
-    // adding rows to schema
-    for (size_t i = 0; i < 1000; i++)
-    {
-        s->add_row(nullptr);
-    }
-    DataFrame *df = new DataFrame(*s); // dataframe which has 1000 rows and no columns
-    RowPrinter rower_ = RowPrinter();  // creating rower object
-    // iterating through the rows and checking that the rower accepts each row given to it
-    Row *r_ = new Row(df->get_schema());
-    for (size_t i = 0; i < df->nrows(); i++)
-    {
-        r_ = new Row(df->get_schema());
-        df->fill_row(i, *r_);
-        assert(rower_.accept(*r_));
-        //delete r_;
-    }
-}
-
 /********************************************************************************************************************
  * testing Columns
  * 
@@ -441,11 +270,11 @@ void testAcceptEmptyRow2()
  */
 void testIntColumnGet1()
 {
-    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+    IntColumn *i = new IntColumn();
+    for (int j = 1; j < 18; j++)
+        i->push_back(j);
     for (int j = 0; j < 17; j++)
-    {
-        assert(i->get(j) == j);
-    }
+        assert(i->get(j) == j + 1);
     delete i;
 }
 
@@ -455,7 +284,11 @@ void testIntColumnGet1()
  */
 void testIntColumnSet2()
 {
-    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+    IntColumn *i = new IntColumn();
+    for (int j = 1; j < 18; j++)
+    {
+        i->push_back(j);
+    }
     // set 1 value in i to something else and check if that one value changed correctly
     i->set(8, 8888);
     assert(i->get(8) == 8888);
@@ -489,7 +322,11 @@ void testIntColumnPushBack3()
     delete i_;
 
     // checking nonempty array
-    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+    IntColumn *i = new IntColumn();
+    for (int j = 1; j < 18; j++)
+    {
+        i->push_back(j);
+    }
     for (size_t j = 0; j < 10000000; j++)
     {
         i->push_back(j * 3);
@@ -516,7 +353,11 @@ void testIntColumnSize4()
     assert(i_->size() == 10000000);
     delete i_;
     // checking nonempty column
-    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+    IntColumn *i = new IntColumn();
+    for (int j = 1; j < 18; j++)
+    {
+        i->push_back(j);
+    }
     assert(i->size() == 17);
     // adding to nonempty column and checking to see if size is as expected after each add and at the end
     for (size_t j = 0; j < 10000000; j++)
@@ -526,7 +367,7 @@ void testIntColumnSize4()
     }
     for (size_t j = 0; j < 17; j++)
     {
-        assert(i->get(j) == j);
+        assert(i->get(j) == j + 1);
     }
     delete i;
 }
@@ -544,7 +385,11 @@ void testIntColumnAsType5()
     assert(i_->as_float() == nullptr);
     assert(i_->as_string() == nullptr);
     // checking nonempty column
-    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+    IntColumn *i = new IntColumn();
+    for (int j = 1; j < 18; j++)
+    {
+        i->push_back(j);
+    }
     assert(i == i->as_int());
     assert(i->as_bool() == nullptr);
     assert(i->as_float() == nullptr);
@@ -563,7 +408,11 @@ void testIntColumnGetType6()
     Column *i_ = new IntColumn();
     assert(i_->get_type() == 'I');
     // checking nonempty column
-    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+    IntColumn *i = new IntColumn();
+    for (int j = 1; j < 18; j++)
+    {
+        i->push_back(j);
+    }
     assert(i->get_type() == 'I');
     delete i;
     delete i_;
@@ -605,7 +454,11 @@ void testIntColumnClone7()
  */
 void testBoolColumnGet1()
 {
-    BoolColumn *i = new BoolColumn(18, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false);
+    BoolColumn *i = new BoolColumn();
+    for (int j = 0; j < 18; j++)
+    {
+        i->push_back(j % 2 == 0);
+    }
     for (size_t j = 0; j < 18; j++)
     {
         assert(i->get(j) == (j % 2 == 0));
@@ -619,7 +472,11 @@ void testBoolColumnGet1()
  */
 void testBoolColumnSet2()
 {
-    BoolColumn *i = new BoolColumn(18, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false);
+    BoolColumn *i = new BoolColumn();
+    for (int j = 0; j < 18; j++)
+    {
+        i->push_back(j % 2 == 0);
+    }
     // set 1 value in i to something else and check if that one value changed correctly
     i->set(8, false);
     assert(!i->get(8));
@@ -654,7 +511,11 @@ void testBoolColumnPushBack3()
     delete i_;
 
     // checking nonempty array
-    BoolColumn *i = new BoolColumn(18, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false);
+    BoolColumn *i = new BoolColumn();
+    for (int j = 0; j < 18; j++)
+    {
+        i->push_back(j % 2 == 0);
+    }
     for (size_t j = 0; j < 10000000; j++)
     {
         i->push_back((j % 2 == 1));
@@ -686,7 +547,11 @@ void testBoolColumnSize4()
     assert(i_->size() == 10000000);
     delete i_;
     // checking nonempty column
-    BoolColumn *i = new BoolColumn(18, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false);
+    BoolColumn *i = new BoolColumn();
+    for (int j = 0; j < 18; j++)
+    {
+        i->push_back(j % 2 == 0);
+    }
     assert(i->size() == 18);
     // adding to nonempty column and checking to see if size is as expected after each add and at the end
     for (size_t j = 0; j < 10000000; j++)
@@ -711,7 +576,11 @@ void testBoolColumnAsType5()
     assert(i_->as_float() == nullptr);
     assert(i_->as_string() == nullptr);
     // checking nonempty column
-    BoolColumn *i = new BoolColumn(18, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false);
+    BoolColumn *i = new BoolColumn();
+    for (int j = 0; j < 18; j++)
+    {
+        i->push_back(j % 2 == 0);
+    }
     assert(i == i->as_bool());
     assert(i->as_int() == nullptr);
     assert(i->as_float() == nullptr);
@@ -730,7 +599,11 @@ void testBoolColumnGetType6()
     Column *i_ = new BoolColumn();
     assert(i_->get_type() == 'B');
     // checking nonempty column
-    BoolColumn *i = new BoolColumn(18, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false);
+    BoolColumn *i = new BoolColumn();
+    for (int j = 0; j < 18; j++)
+    {
+        i->push_back(j % 2 == 0);
+    }
     assert(i->get_type() == 'B');
     delete i;
     delete i_;
@@ -772,12 +645,15 @@ void testBoolColumnClone7()
  */
 void testFloatColumnGet1()
 {
-    FloatColumn *i = new FloatColumn(17, 1.22, 2.22, 3.22, 4.22, 5.22, 6.22, 7.22, 8.22, 9.22, 10.22, 11.22, 12.22, 13.22, 14.22, 15.22, 16.22, 17.22);
+    FloatColumn *i = new FloatColumn();
+    for (int j = 0; j < 17; j++)
+    {
+        i->push_back(float(j) + 1.22);
+    }
     for (size_t j = 0; j < 17; j++)
     {
         float expected = float(j) + 1.22;
-        assert(i->get(j) - expected < 0.001);
-        //assert(i->get(j) - expected > -0.001);
+        assert((i->get(j) - expected < 0.001) && (i->get(j) - expected > -0.001));
     }
     delete i;
 }
@@ -788,7 +664,11 @@ void testFloatColumnGet1()
  */
 void testFloatColumnSet2()
 {
-    FloatColumn *i = new FloatColumn(17, 1.22, 2.22, 3.22, 4.22, 5.22, 6.22, 7.22, 8.22, 9.22, 10.22, 11.22, 12.22, 13.22, 14.22, 15.22, 16.22, 17.22);
+    FloatColumn *i = new FloatColumn();
+    for (int j = 0; j < 17; j++)
+    {
+        i->push_back(float(j) + 1.22);
+    }
     // set 1 value in i to something else and check if that one value changed correctly
     i->set(8, 8.88);
     assert(i->get(8) - 8.88 < 0.001 && i->get(8) - 8.88 > -0.001);
@@ -826,7 +706,11 @@ void testFloatColumnPushBack3()
     delete i_;
 
     // checking nonempty array
-    FloatColumn *i = new FloatColumn(17, 1.22, 2.22, 3.22, 4.22, 5.22, 6.22, 7.22, 8.22, 9.22, 10.22, 11.22, 12.22, 13.22, 14.22, 15.22, 16.22, 17.22);
+    FloatColumn *i = new FloatColumn();
+    for (int j = 0; j < 17; j++)
+    {
+        i->push_back(float(j) + 1.22);
+    }
     for (size_t j = 0; j < 10000000; j++)
     {
         float expected = float(j) + 2.44;
@@ -862,7 +746,11 @@ void testFloatColumnSize4()
     assert(i_->size() == 10000000);
     delete i_;
     // checking nonempty column
-    FloatColumn *i = new FloatColumn(17, 1.22, 2.22, 3.22, 4.22, 5.22, 6.22, 7.22, 8.22, 9.22, 10.22, 11.22, 12.22, 13.22, 14.22, 15.22, 16.22, 17.22);
+    FloatColumn *i = new FloatColumn();
+    for (int j = 0; j < 17; j++)
+    {
+        i->push_back(float(j) + 1.22);
+    }
     assert(i->size() == 17);
     // adding to nonempty column and checking to see if size is as expected after each add and at the end
     for (size_t j = 0; j < 10000000; j++)
@@ -887,7 +775,11 @@ void testFloatColumnAsType5()
     assert(i_->as_int() == nullptr);
     assert(i_->as_string() == nullptr);
     // checking nonempty column
-    FloatColumn *i = new FloatColumn(17, 1.22, 2.22, 3.22, 4.22, 5.22, 6.22, 7.22, 8.22, 9.22, 10.22, 11.22, 12.22, 13.22, 14.22, 15.22, 16.22, 17.22);
+    FloatColumn *i = new FloatColumn();
+    for (int j = 0; j < 17; j++)
+    {
+        i->push_back(float(j) + 1.22);
+    }
     assert(i == i->as_float());
     assert(i->as_bool() == nullptr);
     assert(i->as_int() == nullptr);
@@ -906,7 +798,11 @@ void testFloatColumnGetType6()
     Column *i_ = new FloatColumn();
     assert(i_->get_type() == 'F');
     // checking nonempty column
-    FloatColumn *i = new FloatColumn(17, 1.22, 2.22, 3.22, 4.22, 5.22, 6.22, 7.22, 8.22, 9.22, 10.22, 11.22, 12.22, 13.22, 14.22, 15.22, 16.22, 17.22);
+    FloatColumn *i = new FloatColumn();
+    for (int j = 0; j < 17; j++)
+    {
+        i->push_back(float(j) + 1.22);
+    }
     assert(i->get_type() == 'F');
     delete i;
     delete i_;
@@ -951,25 +847,18 @@ void testFloatColumnClone7()
  */
 void testStringColumnGet1()
 {
-    String *s1 = new String("h");
-    String *s2 = new String("e");
-    String *s3 = new String("l");
-    String *s4 = new String("l");
-    String *s5 = new String("o");
-    String *s6 = new String("w");
-    String *s7 = new String("o");
-    String *s8 = new String("r");
-    String *s9 = new String("l");
-    String *s10 = new String("d");
-    String *s11 = new String("r");
-    String *s12 = new String("e");
-    String *s13 = new String("j");
-    String *s14 = new String("e");
-    String *s15 = new String("c");
-    String *s16 = new String("t");
-    String *s17 = new String("s");
     String *all = new String("helloworldrejects");
-    StringColumn *i = new StringColumn(17, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17);
+    StringColumn *i = new StringColumn();
+    char *c_;
+    String *toAdd;
+    for (size_t j = 0; j < 17; j++)
+    {
+        c_ = new char(all->at(j));
+        toAdd = new String(c_);
+        i->push_back(toAdd->clone());
+        delete toAdd;
+        delete c_;
+    }
     char *c;
     String *expected_;
     for (size_t j = 0; j < 17; j++)
@@ -990,27 +879,20 @@ void testStringColumnGet1()
  */
 void testStringColumnSet2()
 {
-    String *s1 = new String("h");
-    String *s2 = new String("e");
-    String *s3 = new String("l");
-    String *s4 = new String("l");
-    String *s5 = new String("o");
-    String *s6 = new String("w");
-    String *s7 = new String("o");
-    String *s8 = new String("r");
-    String *s9 = new String("l");
-    String *s10 = new String("d");
-    String *s11 = new String("r");
-    String *s12 = new String("e");
-    String *s13 = new String("j");
-    String *s14 = new String("e");
-    String *s15 = new String("c");
-    String *s16 = new String("t");
-    String *s17 = new String("s");
     String *all = new String("helloworldrejects");
     String *new_ = new String("blah");
     String *all2 = new String("blahhityblahhityblah");
-    StringColumn *i = new StringColumn(17, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17);
+    StringColumn *i = new StringColumn();
+    char *c_;
+    String *toAdd;
+    for (size_t j = 0; j < 17; j++)
+    {
+        c_ = new char(all->at(j));
+        toAdd = new String(c_);
+        i->push_back(toAdd->clone());
+        delete toAdd;
+        delete c_;
+    }
     // set 1 value in i to something else and check if that one value changed correctly
     i->set(8, new String("blah"));
     assert(i->get(8)->equals(new_));
@@ -1064,28 +946,21 @@ void testStringColumnPushBack3()
     }
     delete i_;
     // checking nonempty array
-    String *s1 = new String("h");
-    String *s2 = new String("e");
-    String *s3 = new String("l");
-    String *s4 = new String("l");
-    String *s5 = new String("o");
-    String *s6 = new String("w");
-    String *s7 = new String("o");
-    String *s8 = new String("r");
-    String *s9 = new String("l");
-    String *s10 = new String("d");
-    String *s11 = new String("r");
-    String *s12 = new String("e");
-    String *s13 = new String("j");
-    String *s14 = new String("e");
-    String *s15 = new String("c");
-    String *s16 = new String("t");
-    String *s17 = new String("s");
     String *all2 = new String("helloworldrejects");
-    StringColumn *i = new StringColumn(17, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17);
+    StringColumn *i = new StringColumn();
+    char *c_;
+    String *toAdd;
+    for (size_t j = 0; j < 17; j++)
+    {
+        c_ = new char(all2->at(j));
+        toAdd = new String(c_);
+        i->push_back(toAdd->clone());
+        delete toAdd;
+        delete c_;
+    }
     for (size_t j = 0; j < 10000; j++)
     {
-        char *c = new char(all->at(j % size_));
+        c = new char(all->at(j % size_));
         String *expected = new String(c);
         i->push_back(expected->clone());
         assert(i->size() == j + 18);
@@ -1123,24 +998,18 @@ void testStringColumnSize4()
     assert(i_->size() == 10000000);
     delete i_;
     // checking nonempty column
-    String *s1 = new String("h");
-    String *s2 = new String("e");
-    String *s3 = new String("l");
-    String *s4 = new String("l");
-    String *s5 = new String("o");
-    String *s6 = new String("w");
-    String *s7 = new String("o");
-    String *s8 = new String("r");
-    String *s9 = new String("l");
-    String *s10 = new String("d");
-    String *s11 = new String("r");
-    String *s12 = new String("e");
-    String *s13 = new String("j");
-    String *s14 = new String("e");
-    String *s15 = new String("c");
-    String *s16 = new String("t");
-    String *s17 = new String("s");
-    StringColumn *i = new StringColumn(17, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17);
+    String *all = new String("helloworldrejects");
+    StringColumn *i = new StringColumn();
+    char *c_;
+    String *toAdd;
+    for (size_t j = 0; j < 17; j++)
+    {
+        c_ = new char(all->at(j));
+        toAdd = new String(c_);
+        i->push_back(toAdd->clone());
+        delete toAdd;
+        delete c_;
+    }
     assert(i->size() == 17);
     // adding to nonempty column and checking to see if size is as expected after each add and at the end
     for (size_t j = 0; j < 10000000; j++)
@@ -1165,24 +1034,18 @@ void testStringColumnAsType5()
     assert(i_->as_int() == nullptr);
     assert(i_->as_float() == nullptr);
     // checking nonempty column
-    String *s1 = new String("h");
-    String *s2 = new String("e");
-    String *s3 = new String("l");
-    String *s4 = new String("l");
-    String *s5 = new String("o");
-    String *s6 = new String("w");
-    String *s7 = new String("o");
-    String *s8 = new String("r");
-    String *s9 = new String("l");
-    String *s10 = new String("d");
-    String *s11 = new String("r");
-    String *s12 = new String("e");
-    String *s13 = new String("j");
-    String *s14 = new String("e");
-    String *s15 = new String("c");
-    String *s16 = new String("t");
-    String *s17 = new String("s");
-    StringColumn *i = new StringColumn(17, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17);
+    String *all = new String("helloworldrejects");
+    StringColumn *i = new StringColumn();
+    char *c;
+    String *toAdd;
+    for (size_t j = 0; j < 17; j++)
+    {
+        c = new char(all->at(j));
+        toAdd = new String(c);
+        i->push_back(toAdd->clone());
+        delete toAdd;
+        delete c;
+    }
     assert(i == i->as_string());
     assert(i->as_bool() == nullptr);
     assert(i->as_int() == nullptr);
@@ -1201,24 +1064,18 @@ void testStringColumnGetType6()
     Column *i_ = new StringColumn();
     assert(i_->get_type() == 'S');
     // checking nonempty column
-    String *s1 = new String("h");
-    String *s2 = new String("e");
-    String *s3 = new String("l");
-    String *s4 = new String("l");
-    String *s5 = new String("o");
-    String *s6 = new String("w");
-    String *s7 = new String("o");
-    String *s8 = new String("r");
-    String *s9 = new String("l");
-    String *s10 = new String("d");
-    String *s11 = new String("r");
-    String *s12 = new String("e");
-    String *s13 = new String("j");
-    String *s14 = new String("e");
-    String *s15 = new String("c");
-    String *s16 = new String("t");
-    String *s17 = new String("s");
-    StringColumn *i = new StringColumn(17, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17);
+    String *all = new String("helloworldrejects");
+    StringColumn *i = new StringColumn();
+    char *c;
+    String *toAdd;
+    for (size_t j = 0; j < 17; j++)
+    {
+        c = new char(all->at(j));
+        toAdd = new String(c);
+        i->push_back(toAdd->clone());
+        delete toAdd;
+        delete c;
+    }
     assert(i->get_type() == 'S');
     delete i;
     delete i_;
@@ -1278,19 +1135,15 @@ void testGetSchema1()
     Schema *s = new Schema();
     DataFrame *df = new DataFrame(*s);
     Schema got = df->get_schema();
-    assert(got.length() == s->length());
     assert(got.width() == s->width());
 
     // nonempty schema, with only cols
     Schema *s2 = new Schema("IFIBS");
     DataFrame *df2 = new DataFrame(*s2);
     Schema got2 = df2->get_schema();
-    assert(got2.length() == s2->length());
     assert(got2.width() == s2->width());
-    for (size_t i = 0; i < got2.width(); i++)
-    {
+    for (size_t i = 0; i < df2->ncols(); i++)
         assert(got2.col_type(i) == s2->col_type(i));
-    }
 }
 
 /**
@@ -1305,20 +1158,24 @@ void testAddColumn2()
     DataFrame *df = new DataFrame(*s);
     assert(df->nrows() == 0);
     assert(df->ncols() == 0);
-    Column *c = new IntColumn(8, 1, 2, 3, 4, 5, 6, 7, 8);
-    df->add_column(c, new String("name"));
+    Column *c = new IntColumn();
+    for (int j = 1; j < 9; j++)
+    {
+        c->push_back(j);
+    }
+    df->add_column(c);
     assert(df->get_schema().width() == 1);
-    assert(df->get_schema().length() == 8);
-    assert(df->get_schema().col_name(0)->equals(new String("name")));
     assert(df->get_schema().col_type(0) == 'I');
     assert(df->nrows() == 8);
     assert(df->ncols() == 1);
     // now adding another column to nonempty dfs
-    Column *cc = new BoolColumn(8, true, false, true, false, true, false, true, false);
-    df->add_column(cc, new String("2nd col"));
+    Column *cc = new BoolColumn();
+    for (int j = 0; j < 8; j++)
+    {
+        cc->push_back(j % 2 == 0);
+    }
+    df->add_column(cc);
     assert(df->get_schema().width() == 2);
-    assert(df->get_schema().length() == 8);
-    assert(df->get_schema().col_name(1)->equals(new String("2nd col")));
     assert(df->get_schema().col_type(1) == 'B');
     assert(df->nrows() == 8);
     assert(df->ncols() == 2);
@@ -1344,7 +1201,6 @@ void testAddRow3()
         r->set(4, i % 2 == 1);
         df->add_row(*r);
     }
-    assert(df->get_schema().length() == 1000);
     assert(df->get_schema().width() == 5);
     assert(df->nrows() == 1000);
     assert(df->ncols() == 5);
@@ -1359,19 +1215,36 @@ void testGet4()
     // empty schema, no cols/rows
     Schema *s = new Schema();
     DataFrame *df = new DataFrame(*s);
-    Column *c = new IntColumn(8, 1, 2, 3, 4, 5, 6, 7, 8);
-    df->add_column(c, new String("name"));
-    // now adding another column to nonempty dfs
-    Column *c2 = new BoolColumn(8, true, false, true, false, true, false, true, false);
-    df->add_column(c2, new String("2nd col"));
-    Column *c3 = new FloatColumn(8, 1.22, 2.22, 3.22, 4.22, 5.22, 6.22, 7.22, 8.22);
-    df->add_column(c3, new String("3rd"));
-    Column *c4 = new StringColumn(8, new String("h"), new String("e"), new String("l"), new String("l"), new String("o"), new String("w"), new String("o"), new String("r"));
-    df->add_column(c4, new String("4th"));
+    // making columns to add
+    Column *c1 = new IntColumn();
+    Column *c2 = new BoolColumn();
+    Column *c3 = new FloatColumn();
+    Column *c4 = new StringColumn();
+
+    String *all = new String("helloworld");
+    String *toAdd;
+    char *c;
+    for (int j = 1; j < 9; j++)
+    {
+        c1->push_back(j);
+        c2->push_back((j - 1) % 2 == 0);
+        c3->push_back((float)(j + 0.22));
+        c = new char(all->at(j - 1));
+        toAdd = new String(c);
+        c4->push_back(toAdd->clone());
+        delete c;
+        delete toAdd;
+    }
+
+    // adding columns to dfs
+    df->add_column(c1);
+    df->add_column(c2);
+    df->add_column(c3);
+    df->add_column(c4);
+
     assert(df->get_schema().coltypes_->equals((new String("IBFS"))));
     String *expected;
     char *ch;
-    String *all = new String("helloworld");
     for (int i = 0; i < 8; i++)
     {
         assert(df->get_int(0, i) == (i + 1));
@@ -1381,9 +1254,9 @@ void testGet4()
         ch = new char(all->at(i));
         expected = new String(ch);
         assert(df->get_string(3, i)->equals(expected));
+        delete expected;
+        delete ch;
     }
-    delete expected;
-    delete ch;
 }
 
 /**
@@ -1395,19 +1268,37 @@ void testSet5()
     // empty schema, no cols/rows
     Schema *s = new Schema();
     DataFrame *df = new DataFrame(*s);
-    Column *c = new IntColumn(8, 1, 2, 3, 4, 5, 6, 7, 8);
-    df->add_column(c, new String("name"));
-    // now adding another column to nonempty dfs
-    Column *c2 = new BoolColumn(8, true, false, true, false, true, false, true, false);
-    df->add_column(c2, new String("2nd col"));
-    Column *c3 = new FloatColumn(8, 1.22, 2.22, 3.22, 4.22, 5.22, 6.22, 7.22, 8.22);
-    df->add_column(c3, new String("3rd"));
-    Column *c4 = new StringColumn(8, new String("h"), new String("e"), new String("l"), new String("l"), new String("o"), new String("w"), new String("o"), new String("r"));
-    df->add_column(c4, new String("4th"));
-    assert(df->get_schema().coltypes_->equals((new String("IBFS"))));
-    char *ch;
+
+    // making columns to add
+    Column *c1 = new IntColumn();
+    Column *c2 = new BoolColumn();
+    Column *c3 = new FloatColumn();
+    Column *c4 = new StringColumn();
+
     String *all = new String("helloworld");
     String *toAdd;
+    char *c;
+    for (int j = 1; j < 9; j++)
+    {
+        c1->push_back(j);
+        c2->push_back((j - 1) % 2 == 0);
+        c3->push_back((float)(j + 0.22));
+        c = new char(all->at(j - 1));
+        toAdd = new String(c);
+        c4->push_back(toAdd->clone());
+        delete c;
+        delete toAdd;
+    }
+
+    // adding columns to dfs
+    df->add_column(c1);
+    df->add_column(c2);
+    df->add_column(c3);
+    df->add_column(c4);
+
+    assert(df->get_schema().coltypes_->equals((new String("IBFS"))));
+
+    char *ch;
     for (int i = 0; i < 8; i++)
     {
         df->set(0, i, (int)i * 2);
@@ -1416,6 +1307,8 @@ void testSet5()
         ch = new char(all->at(i + 1));
         toAdd = new String(ch);
         df->set(3, i, toAdd);
+        delete ch;
+        delete toAdd;
     }
     String *expected;
     for (int i = 0; i < 8; i++)
@@ -1427,6 +1320,8 @@ void testSet5()
         ch = new char(all->at(i + 1));
         expected = new String(ch);
         assert(df->get_string(3, i)->equals(expected));
+        delete ch;
+        delete expected;
     }
 }
 
@@ -1435,7 +1330,6 @@ void testSet5()
  */
 int main(int argc, char **argv)
 {
-    doesVaListActuallyWork();
     testGet();
     testSet();
     testGrowAndPushBack();
@@ -1443,17 +1337,8 @@ int main(int argc, char **argv)
     testAddEmptyNameColumn();
     testAddColToEmptySchemaNoName();
     testAddColToEmptySchema();
-    testAddRowToEmptySchema();
-    testAddNullRowToEmptySchema();
-    testAddRowToSchema();
-    testAddNullRowToSchema();
-    testGetColIdxEmptySchema();
-    testGetColIdx();
-    testGetRowIdxEmptySchema();
-    testGetRowIdx();
     testAcceptNonemptyRow();
     testAcceptEmptyRow();
-    testAcceptEmptyRow2();
     testIntColumnGet1();
     testIntColumnSet2();
     testIntColumnPushBack3();

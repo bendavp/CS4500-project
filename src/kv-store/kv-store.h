@@ -4,10 +4,10 @@
 #include "value.h"
 #include "../utils/map.h"
 
-class kvstore : public OOMap<Key, Value>
+class kvstore : public Map<Key *, Value *>
 {
 public:
-    kvstore() : OOMap<Key, Value>() {}
+    kvstore() : Map<Key *, Value *>() {}
 };
 
 // makes a DataFrame with the given float array (as a float column); puts DataFrame as Value into given KVstore with the given Key
@@ -16,11 +16,11 @@ DataFrame *DataFrame::fromArray(Key *key, kvstore *kv, size_t sz, float *vals)
     Schema *scm = new Schema();
     DataFrame *df = new DataFrame(*scm);
     Column *fc = new FloatColumn();
-    for (int i = 0; i < sz; i++)
+    for (size_t i = 0; i < sz; i++)
     {
         fc->push_back(vals[i]);
     }
-    df->add_column(fc, nullptr);
+    df->add_column(fc);
     kv->add(key, new Value(df));
     return df;
 }
@@ -32,7 +32,7 @@ DataFrame *DataFrame::fromScalar(Key *key, kvstore *kv, float sum)
     DataFrame *df = new DataFrame(*scm);
     Column *fc = new FloatColumn();
     fc->push_back(sum);
-    df->add_column(fc, nullptr);
+    df->add_column(fc);
     kv->add(key, new Value(df));
     return df;
 }

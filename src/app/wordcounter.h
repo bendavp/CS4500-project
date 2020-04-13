@@ -2,7 +2,7 @@
 
 #include <assert.h>
 #include "reader-writer.h"
-#include "../utils/jv-map.h"
+#include "../utils/map.h"
 #include "application.h"
 #include "../kv-store/kv-store.h"
 
@@ -132,38 +132,44 @@ public:
     size_t j = 0;
     size_t seen = 0;
 
-    Summer(SIMap &map) : map_(map) {}
+    Summer(SIMap &map) : map_(map)
+    {
+        if (!k())
+        {
+            next();
+        }
+    }
 
     void next()
     {
+        assert(!done());
         if (i == map_.capacity_)
             return;
-        if (j < map_.items_[i].keys_.size())
-        {
-            j++;
-            ++seen;
-        }
-        else
+        j++;
+        ++seen;
+        if (j >= map_.items_[i].keys_.length())
         {
             ++i;
             j = 0;
-            while (i < map_.capacity_ && map_.items_[i].keys_.size() == 0)
+            while (i < map_.capacity_ && map_.items_[i].keys_.length() == 0)
+            {
                 i++;
-            if (k())
-                ++seen;
+            }
         }
     }
 
     String *k()
     {
-        if (i == map_.capacity_ || j == map_.items_[i].keys_.size())
+        if (i == map_.capacity_ || j == map_.items_[i].keys_.length())
+        {
             return nullptr;
+        }
         return (String *)(map_.items_[i].keys_.get_(j));
     }
 
     size_t v()
     {
-        if (i == map_.capacity_ || j == map_.items_[i].keys_.size())
+        if (i == map_.capacity_ || j == map_.items_[i].keys_.length())
         {
             assert(false);
             return 0;
@@ -173,16 +179,17 @@ public:
 
     void visit(Row &r)
     {
-        if (!k())
-            next();
         String &key = *k();
         size_t value = v();
-        r.set((size_t)0, &key);
+        r.set(0, &key);
         r.set(1, (int)value);
         next();
     }
 
-    bool done() { return seen == map_.size(); }
+    bool done()
+    {
+        return seen == map_.size();
+    }
 };
 
 /****************************************************************************
@@ -207,7 +214,7 @@ public:
         if (idx_ == 0)
         {
             FileReader fr;
-            delete DataFrame::fromVisitor(&in, node_->kvstore, "S", fr);
+            delete DataFrame::fromVisitor(&in, node_->kv, "S", fr);
         }
         local_count();
         reduce();
@@ -232,7 +239,7 @@ public:
         words->local_map(add);
         delete words;
         Summer cnt(map);
-        delete DataFrame::fromVisitor(mk_key(idx_), node_->kvstore, "SI", cnt);
+        delete DataFrame::fromVisitor(mk_key(idx_), node_->kv, "SI", cnt);
     }
 
     /** Merge the data frames of all nodes */
@@ -243,7 +250,7 @@ public:
         pln("Node 0: reducing counts...");
         SIMap map;
         Key *own = mk_key(0);
-        merge(node_->kvstore->get(own)->decode_df(), map);
+        merge(node_->kv->get(own)->decode_df(), map);
         for (size_t i = 1; i < arg.num_nodes; ++i)
         { // merge other nodes
             Key *ok = mk_key(i);

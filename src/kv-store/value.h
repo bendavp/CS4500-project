@@ -30,17 +30,11 @@ public:
         serialized_ = serialized;
     }
 
-    Value(DataFrame *df) : Value()
-    {
-        encode(df);
-    }
+    Value(DataFrame *df) : Value() { encode(df); }
 
-    Value(FastArray<Key> *keys, size_t sz) : Value()
-    {
-        encode(keys);
-    }
+    Value(FastArray<Key *> *keys, size_t sz) : Value() { encode(keys); }
 
-    void encode(FastArray<Key> *keys)
+    void encode(FastArray<Key *> *keys)
     {
         assert(serialized_ == nullptr);
         assert(vk == ValueKind::Unassigned);
@@ -173,7 +167,7 @@ public:
         delete schema_coltypes;
     }
 
-    FastArray<Key> *decode_keys()
+    FastArray<Key *> *decode_keys()
     {
         assert(serialized_ != nullptr);
         Serializer serializer_ = Serializer();
@@ -188,7 +182,7 @@ public:
         size_t numKeys = serializer_.deserialize_size_t(buffer);
         delete[] buffer;
 
-        FastArray<Key> *keys = new FastArray<Key>;
+        FastArray<Key *> *keys = new FastArray<Key *>;
         StrBuff sb_ = StrBuff();
         char *toAdd = new char[1];
         String *temp;
@@ -232,7 +226,7 @@ public:
         size_t current = 0; // keep track of how far along we have moved
 
         // getting the total num of columns
-        for (int i = current; i < int_size; i++)
+        for (size_t i = current; i < int_size; i++)
         {
             int_temp[i] = serialized_[i];
             current++;
@@ -243,7 +237,7 @@ public:
 
         // getting the total num of rows
         int current2 = current;
-        for (int i = current2; i < current2 + int_size; i++)
+        for (size_t i = current2; i < current2 + int_size; i++)
         {
             int_temp[i - current2] = serialized_[i];
             current++;
@@ -253,7 +247,7 @@ public:
         // getting the col types
         char *ct_ = new char[col];
         current2 = current;
-        for (int i = current2; i < current2 + col; i++)
+        for (size_t i = current2; i < current2 + col; i++)
         {
             ct_[i - current2] = serialized_[i];
             current++;
@@ -274,7 +268,7 @@ public:
                 for (int i = 0; i < row; i++)
                 {
                     current2 = current;
-                    for (int j = current2; j < current2 + bool_size; j++)
+                    for (size_t j = current2; j < current2 + bool_size; j++)
                     {
                         bool_temp[j - current2] = serialized_[j];
                         current++;
@@ -283,7 +277,7 @@ public:
                     bc_->push_back(b_);
                 }
                 // adding copy of bool column to the dataframe
-                decoded_->add_column(bc_->clone(), nullptr);
+                decoded_->add_column(bc_->clone());
                 delete bc_; // delete to reset
             }
             // adding an int column
@@ -295,7 +289,7 @@ public:
                 for (int i = 0; i < row; i++)
                 {
                     current2 = current;
-                    for (int j = current2; j < current2 + int_size; j++)
+                    for (size_t j = current2; j < current2 + int_size; j++)
                     {
                         int_temp[j - current2] = serialized_[j];
                         current++;
@@ -304,7 +298,7 @@ public:
                     ic_->push_back(i_);
                 }
                 // adding copy of int column to the dataframe
-                decoded_->add_column(ic_->clone(), nullptr);
+                decoded_->add_column(ic_->clone());
                 delete ic_; // delete to reset
             }
             // adding a float column
@@ -316,7 +310,7 @@ public:
                 for (int i = 0; i < row; i++)
                 {
                     current2 = current;
-                    for (int j = current2; j < current2 + float_size; j++)
+                    for (size_t j = current2; j < current2 + float_size; j++)
                     {
                         float_temp[j - current2] = serialized_[j];
                         current++;
@@ -325,7 +319,7 @@ public:
                     fc_->push_back(f_);
                 }
                 // adding copy of float column to the dataframe
-                decoded_->add_column(fc_->clone(), nullptr);
+                decoded_->add_column(fc_->clone());
                 delete fc_; // delete to reset
             }
             // adding a String column
@@ -351,7 +345,7 @@ public:
                     sc_->push_back(sb_.get());
                 }
                 // adding copy of string column to the dataframe
-                decoded_->add_column(sc_->clone(), nullptr);
+                decoded_->add_column(sc_->clone());
                 delete sc_; // delete to reset
             }
         }
@@ -367,22 +361,15 @@ public:
         if (other_val->serialized_ == nullptr)
         {
             if (serialized_ != nullptr)
-            {
                 return false;
-            }
             else
-            {
                 return true;
-            }
         }
         return strcmp(other_val->serialized_, serialized_) == 0;
     }
 
     // hashes the serialization as if it is a string object
-    size_t hash()
-    {
-        return String(serialized_).hash();
-    }
+    size_t hash() { return String(serialized_).hash(); }
 
     Value *clone()
     {

@@ -10,7 +10,7 @@ class Serializer
 public:
     Serializer() {}
 
-    void *serialize_key(Key *key, char *buffer)
+    void serialize_key(Key *key, char *buffer)
     {
         StrBuff sb_ = StrBuff();
         char *temp_buff = new char[sizeof(size_t)];
@@ -35,7 +35,7 @@ public:
     Key *deserialize_key(char *key_buffer)
     {
         char *temp_buffer = new char[sizeof(size_t)];
-        for (int i = 0; i < sizeof(size_t); i++)
+        for (size_t i = 0; i < sizeof(size_t); i++)
         {
             temp_buffer[i] = key_buffer[i];
         }
@@ -144,7 +144,7 @@ public:
         String **strArray = new String *[sz];
         StrBuff sb_;
         char *toAdd = new char[1];
-        for (int i = 0; i < sz; i++)
+        for (size_t i = 0; i < sz; i++)
         {
             sb_ = StrBuff();
             int j = current;

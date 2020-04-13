@@ -11,20 +11,20 @@ int main(int argc, char *argv[])
     Node **nodes = new Node *[arg.num_nodes];
     Application **apps = new Application *[arg.num_nodes];
 
-    for (int i = 0; i < arg.num_nodes; i++)
+    for (size_t i = 0; i < arg.num_nodes; i++)
     {
         nodes[i] = new Node(i, network_);
         std::cout << "Node " << i << " registered..." << std::endl;
         nodes[i]->start();
         std::cout << "... and started" << std::endl;
     }
-    for (int i = 0; i < arg.num_nodes; i++)
+    for (size_t i = 0; i < arg.num_nodes; i++)
     {
         apps[i] = new WordCount(i, nodes[i]);
         apps[i]->sleep(1000);
         std::cout << "App " << i << " started..." << std::endl;
     }
-    for (int i = 0; i < arg.num_nodes; i++)
+    for (size_t i = 0; i < arg.num_nodes; i++)
     {
         apps[i]->run();
         std::cout << "... and running" << std::endl;

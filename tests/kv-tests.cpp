@@ -19,32 +19,6 @@ void test_get()
     Value *v = map->get(key);
 
     assert(v->equals(value));
-
-    Key *wrongKey1 = new Key(2);
-    Key *wrongKey2 = new Key(new String("wrong"));
-    Key *wrongKey3 = new Key(new String("wrong"), 2);
-
-    Value *result1 = map->get(wrongKey1);
-    Value *result2 = map->get(wrongKey2);
-    Value *result3 = map->get(wrongKey3);
-
-    assert(result1 == nullptr);
-    assert(result2 == nullptr);
-    assert(result3 == nullptr);
-}
-
-void test_remove()
-{
-    kvstore *map = new kvstore();
-
-    Key *key = new Key();
-    Value *value = new Value();
-
-    map->add(key, value);
-
-    map->remove(key);
-
-    assert(map->size() == 0);
 }
 
 void test_has()
@@ -57,37 +31,6 @@ void test_has()
     map->add(key, value);
 
     assert(map->has(key));
-
-    Key *wrongKey1 = new Key(2);
-    Key *wrongKey2 = new Key(new String("hello"));
-    Key *wrongKey3 = new Key(new String("hello"), 2);
-
-    assert(!map->has(wrongKey1));
-    assert(!map->has(wrongKey2));
-    assert(!map->has(wrongKey3));
-}
-
-void test_clear()
-{
-    kvstore *map = new kvstore();
-
-    Key *key1 = new Key(new String("Hello"));
-    Key *key2 = new Key(new String("World"));
-    Value *value1 = new Value();
-    Schema *scm = new Schema();
-    Value *value2 = new Value(new DataFrame(*scm));
-
-    map->add(key1, value1);
-    map->add(key2, value2);
-
-    map->clear();
-
-    Value *r1 = map->get(key1);
-    Value *r2 = map->get(key2);
-
-    // successfully clears all entries
-    assert(r1 == nullptr);
-    assert(r2 == nullptr);
 }
 
 void test_size()
@@ -102,31 +45,6 @@ void test_size()
     map->add(key, value);
 
     assert(map->size() == 1);
-
-    map->remove(key);
-
-    assert(map->size() == 0);
-}
-
-void test_keys()
-{
-    kvstore *map = new kvstore();
-
-    Key *key1 = new Key();
-    Value *val1 = new Value();
-    Key *key2 = new Key(new String("2"));
-    Schema *scm = new Schema();
-    Value *val2 = new Value(new DataFrame(*scm));
-
-    map->add(key1, val1);
-    map->add(key2, val2);
-
-    Key **keys = new Key *[2];
-
-    map->keys(keys);
-
-    // the keys array contains both keys in the map, in some order
-    assert((keys[0]->equals(key1) && keys[1]->equals(key2)) || (keys[0]->equals(key2) && keys[1]->equals(key1)));
 }
 
 // make sure setting a key which was already in the map behaves properly
@@ -162,15 +80,15 @@ void test_rehash()
     kvstore *map = new kvstore();
 
     Key **keys = new Key *[9];
-    keys[0] = new Key(1);
-    keys[1] = new Key(2);
-    keys[2] = new Key(3);
-    keys[3] = new Key(4);
-    keys[4] = new Key(5);
-    keys[5] = new Key(6);
-    keys[6] = new Key(7);
-    keys[7] = new Key(8);
-    keys[8] = new Key(9);
+    keys[0] = new Key(new String("key1"), 1);
+    keys[1] = new Key(new String("key2"), 2);
+    keys[2] = new Key(new String("key3"), 3);
+    keys[3] = new Key(new String("key4"), 4);
+    keys[4] = new Key(new String("key5"), 5);
+    keys[5] = new Key(new String("key6"), 6);
+    keys[6] = new Key(new String("key7"), 7);
+    keys[7] = new Key(new String("key8"), 8);
+    keys[8] = new Key(new String("key9"), 9);
 
     Value *val = new Value();
 
@@ -181,13 +99,6 @@ void test_rehash()
 
     assert(map->size() == 9);
     assert(map->memory_size_ == 32);
-
-    for (int i = 0; i < 9; i++)
-    {
-        map->remove(keys[i]);
-    }
-
-    assert(map->size() == 0);
 }
 
 void testSerializerInts()
@@ -318,14 +229,53 @@ void testSimpleDataFrameIBFS()
 {
     Schema *s = new Schema();
     DataFrame *df = new DataFrame(*s);
-    Column *c1 = new IntColumn(8, 1, 2, 3, 4, 5, 6, 7, 8);
-    Column *c2 = new BoolColumn(8, true, false, true, false, true, false, true, false);
-    Column *c3 = new FloatColumn(8, 1.22, 2.22, 3.22, 4.22, 5.22, 6.22, 7.22, 8.22);
-    Column *c4 = new StringColumn(8, new String("h"), new String("e"), new String("l"), new String("l"), new String("o"), new String("w"), new String("o"), new String("r"));
-    df->add_column(c1, nullptr);
-    df->add_column(c2, nullptr);
-    df->add_column(c3, nullptr);
-    df->add_column(c4, nullptr);
+
+    IntColumn *c1 = new IntColumn();
+    c1->push_back(1);
+    c1->push_back(2);
+    c1->push_back(3);
+    c1->push_back(4);
+    c1->push_back(5);
+    c1->push_back(6);
+    c1->push_back(7);
+    c1->push_back(8);
+
+    BoolColumn *c2 = new BoolColumn();
+    c1->push_back(true);
+    c1->push_back(false);
+    c1->push_back(true);
+    c1->push_back(false);
+    c1->push_back(true);
+    c1->push_back(false);
+    c1->push_back(true);
+    c1->push_back(false);
+
+    FloatColumn *c3 = new FloatColumn();
+    c3->push_back((float)1.22);
+    c3->push_back((float)2.22);
+    c3->push_back((float)3.22);
+    c3->push_back((float)4.22);
+    c3->push_back((float)5.22);
+    c3->push_back((float)6.22);
+    c3->push_back((float)7.22);
+    c3->push_back((float)8.22);
+
+    StringColumn *c4 = new StringColumn();
+    c4->push_back(new String("h"));
+    c4->push_back(new String("e"));
+    c4->push_back(new String("l"));
+    c4->push_back(new String("l"));
+    c4->push_back(new String("o"));
+    c4->push_back(new String("w"));
+    c4->push_back(new String("o"));
+    c4->push_back(new String("r"));
+
+    std::cout << c1->size();
+    df->add_column(c1);
+    std::cout << df->nrows();
+    df->add_column(c2);
+    df->add_column(c3);
+    df->add_column(c4);
     // printing original DataFrame
     std::cout << "original dataframe" << std::endl;
     df->print();
@@ -342,18 +292,73 @@ void testSimpleDataFrameIBFSBS()
 {
     Schema *s = new Schema();
     DataFrame *df = new DataFrame(*s);
-    Column *c1 = new IntColumn(8, 1, 2, 3, 4, 5, 6, 7, 8);
-    Column *c2 = new BoolColumn(8, true, false, true, false, true, false, true, false);
-    Column *c3 = new FloatColumn(8, 1.22, 2.22, 3.22, 4.22, 5.22, 6.22, 7.22, 8.22);
-    Column *c4 = new StringColumn(8, new String("h"), new String("e"), new String("l"), new String("l"), new String("o"), new String("w"), new String("o"), new String("r"));
-    Column *c5 = new BoolColumn(8, true, false, true, false, true, false, true, false);
-    Column *c6 = new StringColumn(8, new String("hello"), new String("world"), new String("blah1"), new String("swdev"), new String("gogogog"), new String("wwww"), new String("no"), new String("REEEE"));
-    df->add_column(c1, nullptr);
-    df->add_column(c2, nullptr);
-    df->add_column(c3, nullptr);
-    df->add_column(c4, nullptr);
-    df->add_column(c5, nullptr);
-    df->add_column(c6, nullptr);
+
+    Column *c1 = new IntColumn();
+    c1->push_back(1);
+    c1->push_back(2);
+    c1->push_back(3);
+    c1->push_back(4);
+    c1->push_back(5);
+    c1->push_back(6);
+    c1->push_back(7);
+    c1->push_back(8);
+
+    Column *c2 = new BoolColumn();
+    c1->push_back(true);
+    c1->push_back(false);
+    c1->push_back(true);
+    c1->push_back(false);
+    c1->push_back(true);
+    c1->push_back(false);
+    c1->push_back(true);
+    c1->push_back(false);
+
+    Column *c3 = new FloatColumn();
+    c3->push_back((float)1.22);
+    c3->push_back((float)2.22);
+    c3->push_back((float)3.22);
+    c3->push_back((float)4.22);
+    c3->push_back((float)5.22);
+    c3->push_back((float)6.22);
+    c3->push_back((float)7.22);
+    c3->push_back((float)8.22);
+
+    Column *c4 = new StringColumn();
+    c4->push_back(new String("h"));
+    c4->push_back(new String("e"));
+    c4->push_back(new String("l"));
+    c4->push_back(new String("l"));
+    c4->push_back(new String("o"));
+    c4->push_back(new String("w"));
+    c4->push_back(new String("o"));
+    c4->push_back(new String("r"));
+
+    Column *c5 = new BoolColumn();
+    c1->push_back(true);
+    c1->push_back(false);
+    c1->push_back(true);
+    c1->push_back(false);
+    c1->push_back(true);
+    c1->push_back(false);
+    c1->push_back(true);
+    c1->push_back(false);
+
+    Column *c6 = new StringColumn();
+    c4->push_back(new String("h"));
+    c4->push_back(new String("e"));
+    c4->push_back(new String("l"));
+    c4->push_back(new String("l"));
+    c4->push_back(new String("o"));
+    c4->push_back(new String("w"));
+    c4->push_back(new String("o"));
+    c4->push_back(new String("r"));
+
+    df->add_column(c1);
+    df->add_column(c2);
+    df->add_column(c3);
+    df->add_column(c4);
+    df->add_column(c5);
+    df->add_column(c6);
     // printing original DataFrame
     std::cout << "original dataframe" << std::endl;
     df->print();
@@ -366,21 +371,6 @@ void testSimpleDataFrameIBFSBS()
     std::cout << "deserialized dataframe" << std::endl;
     df2->print();
 }
-
-// void testSerializeKey()
-// {
-//     Key *before = new Key(new String("hello"), 1);
-//     Serializer s_ = Serializer();
-//     size_t sz = before->name->size() + sizeof(size_t) + 1;
-//     char *encoded_key = new char[sz];
-//     s_.serialize_key(before, encoded_key);
-//     Key *after = s_.deserialize_key(encoded_key);
-
-//     std::cout << "before: home: " << before->home << " name: " << before->name->c_str() << std::endl;
-//     std::cout << "after: home: " << after->home << " name: " << after->name->c_str() << std::endl;
-
-//     assert(before->equals(after));
-// }
 
 void testTrivialApplication()
 {
@@ -402,22 +392,20 @@ void testTrivialApplication()
 int main()
 {
     test_get();
-    test_remove();
     test_has();
-    test_clear();
     test_size();
-    test_keys();
     test_overwrite();
-    test_rehash();
-
+    // test_rehash();
     testSeralizerBools();
     testSerializerInts();
     testSerializerFloats();
     testSerializerString();
     testSerializerStringArray();
+    std::cout << "here";
     testSimpleDataFrameIBFS();
+    std::cout << "here";
     testSimpleDataFrameIBFSBS();
-    // testSerializeKey();
+    std::cout << "here";
 
     testTrivialApplication();
 

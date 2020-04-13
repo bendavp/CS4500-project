@@ -16,7 +16,7 @@ class Node : public Thread
 {
 public:
     PseudoNetwork *network_;
-    kvstore *kvstore;
+    kvstore *kv;
     size_t idx_;
     Lock lock_;
     Reply *reply_;
@@ -42,7 +42,7 @@ public:
             else if (m->kind_ == MsgKind::Get)
             {
                 Get *getMsg = dynamic_cast<Get *>(m);
-                Value *v = kvstore->get(getMsg->key_);
+                Value *v = kv->get(getMsg->key_);
                 Reply *reMsg = new Reply(idx_, getMsg->sender_, v);
                 network_->send_m(reMsg);
                 delete getMsg;
@@ -78,8 +78,8 @@ public:
         // this is the correct node for the key
         else
         {
-            assert(!kvstore->has(key));
-            kvstore->add(key, val);
+            assert(!kv->has(key));
+            kv->add(key, val);
         }
     }
 
@@ -100,7 +100,7 @@ public:
         // this is the correct node for the key
         else
         {
-            return kvstore->get(key);
+            return kv->get(key);
         }
     }
 
@@ -120,11 +120,11 @@ public:
         else
         {
             // wait for this key to appear in this node
-            while (!kvstore->has(key))
+            while (!kv->has(key))
             {
                 sleep(5000);
             }
-            return kvstore->get(key);
+            return kv->get(key);
         }
     }
 };

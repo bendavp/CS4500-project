@@ -42,7 +42,7 @@ public:
     }
 };
 
-class StringSztMap : public OPMap<String, size_t>
+class StringSztMap : public Map<String *, size_t>
 {
 public:
     Lock lock_;
@@ -67,7 +67,7 @@ class PseudoNetwork : public Object
 {
 public:
     StringSztMap threads_;
-    FastArray<MessageQueue> qs_;
+    FastArray<MessageQueue *> qs_;
 
     PseudoNetwork(size_t num_threads) : Object()
     {

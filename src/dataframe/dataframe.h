@@ -43,10 +43,7 @@ public:
     size_t row_num_;
     /** Called before visiting a row, the argument is the row offset in the
     dataframe. */
-    virtual void start(size_t r)
-    {
-        row_num_ = r;
-    }
+    virtual void start(size_t r) { row_num_ = r; }
 
     /** Called for fields of the argument's type with the value of the field. */
     virtual void accept(bool b)
@@ -71,10 +68,7 @@ public:
     }
 
     /** Called when all fields have been seen. */
-    virtual void done()
-    {
-        pln("");
-    }
+    virtual void done() { pln(""); }
 };
 
 /*************************************************************************
@@ -117,65 +111,29 @@ public:
 
     /** Setters: set the given column with the given value. Setting a column with
     * a value of the wrong type is undefined. */
-    void set(size_t col, int val)
-    {
-        int_arr_[col] = val;
-    }
-    void set(size_t col, float val)
-    {
-        float_arr_[col] = val;
-    }
-    void set(size_t col, bool val)
-    {
-        bool_arr_[col] = val;
-    }
+    void set(size_t col, int val) { int_arr_[col] = val; }
+    void set(size_t col, float val) { float_arr_[col] = val; }
+    void set(size_t col, bool val) { bool_arr_[col] = val; }
     /** The string is external. */
-    void set(size_t col, String *val)
-    {
-        str_arr_[col] = val->clone();
-    }
+    void set(size_t col, String *val) { str_arr_[col] = val->clone(); }
 
     /** Set/get the index of this row (ie. its position in the dataframe. 
      * This is only used for informational purposes, unused otherwise */
-    void set_idx(size_t idx)
-    {
-        idx_ = idx;
-    }
-    size_t get_idx()
-    {
-        return idx_;
-    }
+    void set_idx(size_t idx) { idx_ = idx; }
+    size_t get_idx() { return idx_; }
 
     /** Getters: get the value at the given column. If the column is not
     * of the requested type, the result is undefined. */
-    int get_int(size_t col)
-    {
-        return int_arr_[col];
-    }
-    bool get_bool(size_t col)
-    {
-        return bool_arr_[col];
-    }
-    float get_float(size_t col)
-    {
-        return float_arr_[col];
-    }
-    String *get_string(size_t col)
-    {
-        return str_arr_[col]->clone();
-    }
+    int get_int(size_t col) { return int_arr_[col]; }
+    bool get_bool(size_t col) { return bool_arr_[col]; }
+    float get_float(size_t col) { return float_arr_[col]; }
+    String *get_string(size_t col) { return str_arr_[col]->clone(); }
 
     /** Number of fields in the row. */
-    size_t width()
-    {
-        return schema_->width();
-    }
+    size_t width() { return schema_->width(); }
 
     /** Type of the field at the given position. An idx >= width is  undefined. */
-    char col_type(size_t idx)
-    {
-        return schema_->col_type(idx);
-    }
+    char col_type(size_t idx) { return schema_->col_type(idx); }
 
     /** Given a Fielder, visit every field of this row. The first argument is
     * index of the row in the dataframe.
@@ -183,28 +141,18 @@ public:
     void visit(size_t idx, Fielder &f)
     {
         f.start(idx);
-        for (int i = 0; i < schema_->width(); i++)
+        for (size_t i = 0; i < schema_->width(); i++)
         {
             if (col_type(i) == 'S')
-            {
                 f.accept(str_arr_[i]);
-            }
             else if (col_type(i) == 'I')
-            {
                 f.accept(int_arr_[i]);
-            }
             else if (col_type(i) == 'F')
-            {
                 f.accept(float_arr_[i]);
-            }
             else if (col_type(i) == 'B')
-            {
                 f.accept(bool_arr_[i]);
-            }
             else
-            {
                 assert(false);
-            }
         }
         f.done();
     }
@@ -225,20 +173,7 @@ public:
       should not be retained as it is likely going to be reused in the next
       call. The return value is used in filters to indicate that a row
       should be kept. */
-    virtual bool accept(Row &r)
-    {
-    }
-
-    /** Once traversal of the data frame is complete the rowers that were
-      split off will be joined.  There will be one join per split. The
-      original object will be the last to be called join on. The join method
-      is reponsible for cleaning up memory. */
-    virtual void join_delete(Rower *other) {}
-
-    virtual Rower *clone()
-    {
-        return this;
-    }
+    virtual bool accept(Row &r) = 0;
 };
 
 class RowPrinter : public Rower
@@ -255,48 +190,6 @@ public:
         r.visit(r.get_idx(), printer_);
         return true;
     }
-
-    /** Once traversal of the data frame is complete the rowers that were
-      split off will be joined.  There will be one join per split. The
-      original object will be the last to be called join on. The join method
-      is reponsible for cleaning up memory. */
-    void join_delete(Rower *other)
-    {
-        delete other;
-    }
-};
-
-/****************************************************************************
- * @brief RowThread::
- * 
- * RowThread is a thread that can take a Rower and iterate through "some" of the rows
- * in the given Dataframe.
- * 
- * @author BK and AT
- */
-
-// forward declaration so RowThread can "use" DataFrame's fill_row()
-class DataFrame;
-
-class RowThread : public Thread
-{
-public:
-    Rower *rower_;
-    size_t row_num_;
-    DataFrame *df_;
-    size_t start_;
-    size_t end_;
-
-    RowThread(DataFrame *df, Rower *r, size_t start, size_t end) : Thread()
-    {
-        df_ = df;
-        rower_ = r;
-        start_ = start;
-        end_ = end;
-    }
-
-    /** Subclass responsibility, the body of the run method */
-    void run();
 };
 
 class kvstore;
@@ -318,7 +211,7 @@ public:
     Schema *schema_;
     size_t nrows_;
     size_t ncols_;
-    ColumnFastArray *col_arr_;
+    FastArray<Column *> *col_arr_;
 
     /** Create a data frame with the same columns as the given df but with no rows or rownames */
     DataFrame(DataFrame &df) : DataFrame(*df.schema_) {}
@@ -327,12 +220,10 @@ public:
     * empty. */
     DataFrame(Schema &schema)
     {
-        schema_ = new Schema();
-        schema_->coltypes_ = schema.coltypes_;
-        schema_->col_names_ = schema.col_names_;
+        schema_ = new Schema(schema);
         nrows_ = 0;
         ncols_ = schema_->width();
-        col_arr_ = new ColumnFastArray();
+        col_arr_ = new FastArray<Column *>();
         for (size_t i = 0; i < ncols_; i++)
         {
             if (schema_->col_type(i) == 'S')
@@ -360,38 +251,20 @@ public:
 
     /** Returns the dataframe's schema. Modifying the schema after a dataframe
     * has been created in undefined. */
-    Schema &get_schema()
-    {
-        return *schema_;
-    }
+    Schema &get_schema() { return *schema_; }
 
     /** Adds a column this dataframe, updates the schema, the new column
     * is external, and appears as the last column of the dataframe, the
     * name is optional and external. A nullptr column is undefined. */
-    void add_column(Column *col, String *name)
+    void add_column(Column *col)
     {
         assert(col != nullptr);
         if (ncols_ > 0)
-        {
             assert(col->size() == nrows_); // checking that size of column is the same
-        }
         if (ncols_ == 0)
-        {
             nrows_ = col->size(); // if there were no columns, then set the row size to this column
-            for (size_t i = 0; i < nrows_; i++)
-            {
-                schema_->add_row(nullptr);
-            }
-        }
         col_arr_->push_back(col->clone());
-        if (name == nullptr)
-        {
-            schema_->add_column(col->get_type(), nullptr);
-        }
-        else
-        {
-            schema_->add_column(col->get_type(), name->clone());
-        }
+        schema_->add_column(col->get_type());
         ncols_ = ncols_ + 1; // update ncol size
     }
 
@@ -421,18 +294,6 @@ public:
         assert(schema_->col_type(col) == 'S');
         assert(row < nrows_);
         return col_arr_->get(col)->as_string()->get(row);
-    }
-
-    /** Return the offset of the given column name or -1 if no such col. */
-    int get_col(String &col)
-    {
-        return schema_->col_idx(col.c_str());
-    }
-
-    /** Return the offset of the given row name or -1 if no such row. */
-    int get_row(String &col)
-    {
-        return schema_->row_idx(col.c_str());
     }
 
     /** Set the value at the given column and row to the given value.
@@ -474,18 +335,6 @@ public:
         assert(schema_->width() == row.schema_->width());
         for (size_t i = 0; i < schema_->width(); i++)
         {
-            if (schema_->col_name(i) == nullptr)
-            {
-                assert(row.schema_->col_name(i) == nullptr);
-            }
-            else if (row.schema_->col_name(i) == nullptr)
-            {
-                assert(schema_->col_name(i) == nullptr);
-            }
-            else
-            {
-                assert(schema_->col_name(i)->equals(row.schema_->col_name(i)));
-            }
             assert(schema_->col_type(i) == row.schema_->col_type(i));
         }
         row.set_idx(idx);
@@ -493,25 +342,15 @@ public:
         for (size_t i = 0; i < col_arr_->size(); i++)
         {
             if (col_arr_->get(i)->get_type() == 'S')
-            {
                 row.set(i, col_arr_->get(i)->as_string()->get(idx));
-            }
             else if (col_arr_->get(i)->get_type() == 'I')
-            {
                 row.set(i, col_arr_->get(i)->as_int()->get(idx));
-            }
             else if (col_arr_->get(i)->get_type() == 'F')
-            {
                 row.set(i, col_arr_->get(i)->as_float()->get(idx));
-            }
             else if (col_arr_->get(i)->get_type() == 'B')
-            {
                 row.set(i, col_arr_->get(i)->as_bool()->get(idx));
-            }
             else
-            {
                 exit(1);
-            }
         }
     }
 
@@ -524,62 +363,27 @@ public:
         assert(schema_->width() == row.schema_->width());
         for (size_t i = 0; i < schema_->width(); i++)
         {
-            if (schema_->col_name(i) == nullptr)
-            {
-                assert(row.schema_->col_name(i) == nullptr);
-            }
-            else if (row.schema_->col_name(i) == nullptr)
-            {
-                assert(schema_->col_name(i) == nullptr);
-            }
-            else
-            {
-                assert(schema_->col_name(i)->equals(row.schema_->col_name(i)));
-            }
             assert(schema_->col_type(i) == row.schema_->col_type(i));
         }
         for (size_t i = 0; i < row.width(); i++)
         {
             if (row.col_type(i) == 'S')
-            {
                 col_arr_->get(i)->push_back(row.get_string(i));
-            }
             else if (row.col_type(i) == 'F')
-            {
                 col_arr_->get(i)->push_back(row.get_float(i));
-            }
             else if (row.col_type(i) == 'I')
-            {
                 col_arr_->get(i)->push_back(row.get_int(i));
-            }
             else if (row.col_type(i) == 'B')
-            {
                 col_arr_->get(i)->push_back(row.get_bool(i));
-            }
-        }
-        row.set_idx(nrows() - 1);
-        if (row.schema_->length() > row.get_idx())
-        {
-            schema_->add_row(row.schema_->row_name(row.get_idx())); // add the row's name to this schema
-        }
-        else
-        {
-            schema_->add_row(nullptr);
         }
         nrows_ = nrows_ + 1;
     }
 
     /** The number of rows in the dataframe. */
-    size_t nrows()
-    {
-        return nrows_;
-    }
+    size_t nrows() { return nrows_; }
 
     /** The number of columns in the dataframe.*/
-    size_t ncols()
-    {
-        return ncols_;
-    }
+    size_t ncols() { return ncols_; }
 
     /** Visit rows in order */
     void map(Rower &r)
@@ -602,66 +406,6 @@ public:
         }
     }
 
-    /** This method clones the Rower and executes the map in parallel. Join is
-    * used at the end to merge the results. */
-    void pmap(Rower &r)
-    {
-        int numThreads = 2;
-
-        RowThread **thread_list_ = new RowThread *[numThreads];
-        Rower **rower_list_ = new Rower *[numThreads];
-
-        size_t *start_indices_ = new size_t[numThreads];
-        size_t *end_indices_ = new size_t[numThreads];
-
-        for (int i = 0; i < numThreads; i++)
-        {
-            start_indices_[i] = nrows_ * i / numThreads;
-        }
-        for (int i = 1; i < numThreads + 1; i++)
-        {
-            end_indices_[i - 1] = nrows_ * i / numThreads;
-        }
-
-        // populate rows and threads and start each thread
-        for (int i = 0; i < numThreads; i++)
-        {
-            // maybe save one clone?
-            rower_list_[i] = r.clone();
-            thread_list_[i] = new RowThread(this, rower_list_[i], start_indices_[i], end_indices_[i]);
-            thread_list_[i]->start();
-        }
-
-        for (int i = 0; i < numThreads; i++)
-        {
-            thread_list_[i]->join();
-        }
-
-        for (int i = numThreads - 2; i >= 0; i--)
-        {
-            rower_list_[i]->join_delete(rower_list_[i + 1]);
-        }
-    }
-
-    /** Create a new dataframe, constructed from rows for which the given Rower
-    * returned true from its accept method. */
-    DataFrame *filter(Rower &r)
-    {
-        DataFrame *df = new DataFrame(*this);
-
-        for (size_t i = 0; i < nrows_; i++)
-        {
-            Row row_ = Row(df->get_schema());
-            row_.set_idx(i);
-            fill_row(i, row_);
-            if (r.accept(row_))
-            {
-                df->add_row(row_);
-            }
-        }
-        return df;
-    }
-
     /** Print the dataframe in SoR format to standard output. */
     void print()
     {
@@ -675,13 +419,3 @@ public:
 
     static DataFrame *fromVisitor(Key *key, kvstore *kvstore, const char *schema, Writer &w);
 };
-
-void RowThread::run()
-{
-    Row r = Row(df_->get_schema());
-    for (size_t i = start_; i < end_; i++)
-    {
-        df_->fill_row(i, r);
-        rower_->accept(r);
-    }
-}

@@ -146,26 +146,3 @@ public:
         hash_ = hash_me();
     }
 };
-
-/***************************************************************************
- * 
- **********************************************************author:jvitek */
-class Num : public Object
-{
-public:
-    size_t v = 0;
-    Num() {}
-    Num(size_t v) : v(v) {}
-};
-
-class SIMap : public Map
-{
-public:
-    SIMap() {}
-    Num *get(String &key) { return dynamic_cast<Num *>(get_(key)); }
-    void set(String &k, Num *v)
-    {
-        assert(v);
-        Map::set(k, v);
-    }
-}; // KVMap

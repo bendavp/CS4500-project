@@ -8,28 +8,17 @@ public:
     String *name; // unique identifier for the key
     size_t home;  // home node on which this key lives
 
-    Key() : Object()
-    {
-        name = new String("key");
-        home = 0;
-    }
-
-    Key(size_t h) : Key()
-    {
-        home = h;
-    }
-
-    Key(String *n) : Key()
-    {
-        delete name;
-        name = n;
-    }
-
     Key(String *n, size_t h) : Object()
     {
         name = n;
         home = h;
     }
+
+    Key() : Key(new String("key"), 0) {}
+
+    Key(size_t h) : Key(new String("key"), 0) {}
+
+    Key(String *n) : Key(n, 0) {}
 
     bool equals(Object *other) override
     {
@@ -39,15 +28,9 @@ public:
         return other_key->name->equals(name) && other_key->home == home;
     }
 
-    size_t hash_me() override
-    {
-        return name->hash();
-    }
+    size_t hash_me() override { return name->hash() + home; }
 
-    Key *clone() override
-    {
-        return new Key(name->clone(), home);
-    }
+    Key *clone() override { return new Key(name->clone(), home); }
 };
 
 class KeyBuff : public Object
