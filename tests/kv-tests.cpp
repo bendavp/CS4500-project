@@ -241,14 +241,14 @@ void testSimpleDataFrameIBFS()
     c1->push_back(8);
 
     BoolColumn *c2 = new BoolColumn();
-    c1->push_back(true);
-    c1->push_back(false);
-    c1->push_back(true);
-    c1->push_back(false);
-    c1->push_back(true);
-    c1->push_back(false);
-    c1->push_back(true);
-    c1->push_back(false);
+    c2->push_back(true);
+    c2->push_back(false);
+    c2->push_back(true);
+    c2->push_back(false);
+    c2->push_back(true);
+    c2->push_back(false);
+    c2->push_back(true);
+    c2->push_back(false);
 
     FloatColumn *c3 = new FloatColumn();
     c3->push_back((float)1.22);
@@ -270,9 +270,7 @@ void testSimpleDataFrameIBFS()
     c4->push_back(new String("o"));
     c4->push_back(new String("r"));
 
-    std::cout << c1->size();
     df->add_column(c1);
-    std::cout << df->nrows();
     df->add_column(c2);
     df->add_column(c3);
     df->add_column(c4);
@@ -304,14 +302,14 @@ void testSimpleDataFrameIBFSBS()
     c1->push_back(8);
 
     Column *c2 = new BoolColumn();
-    c1->push_back(true);
-    c1->push_back(false);
-    c1->push_back(true);
-    c1->push_back(false);
-    c1->push_back(true);
-    c1->push_back(false);
-    c1->push_back(true);
-    c1->push_back(false);
+    c2->push_back(true);
+    c2->push_back(false);
+    c2->push_back(true);
+    c2->push_back(false);
+    c2->push_back(true);
+    c2->push_back(false);
+    c2->push_back(true);
+    c2->push_back(false);
 
     Column *c3 = new FloatColumn();
     c3->push_back((float)1.22);
@@ -334,24 +332,24 @@ void testSimpleDataFrameIBFSBS()
     c4->push_back(new String("r"));
 
     Column *c5 = new BoolColumn();
-    c1->push_back(true);
-    c1->push_back(false);
-    c1->push_back(true);
-    c1->push_back(false);
-    c1->push_back(true);
-    c1->push_back(false);
-    c1->push_back(true);
-    c1->push_back(false);
+    c5->push_back(true);
+    c5->push_back(false);
+    c5->push_back(true);
+    c5->push_back(false);
+    c5->push_back(true);
+    c5->push_back(false);
+    c5->push_back(true);
+    c5->push_back(false);
 
     Column *c6 = new StringColumn();
-    c4->push_back(new String("h"));
-    c4->push_back(new String("e"));
-    c4->push_back(new String("l"));
-    c4->push_back(new String("l"));
-    c4->push_back(new String("o"));
-    c4->push_back(new String("w"));
-    c4->push_back(new String("o"));
-    c4->push_back(new String("r"));
+    c6->push_back(new String("h"));
+    c6->push_back(new String("e"));
+    c6->push_back(new String("l"));
+    c6->push_back(new String("l"));
+    c6->push_back(new String("o"));
+    c6->push_back(new String("w"));
+    c6->push_back(new String("o"));
+    c6->push_back(new String("r"));
 
     df->add_column(c1);
     df->add_column(c2);
@@ -401,11 +399,8 @@ int main()
     testSerializerFloats();
     testSerializerString();
     testSerializerStringArray();
-    std::cout << "here";
     testSimpleDataFrameIBFS();
-    std::cout << "here";
     testSimpleDataFrameIBFSBS();
-    std::cout << "here";
 
     testTrivialApplication();
 
