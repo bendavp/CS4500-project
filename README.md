@@ -1,7 +1,7 @@
 # eau2: A semester-long project for CS4500 (Software Development)
 
 ### Authors:
-- [Amy Tang] (https://github.com/tang-amy)
+- [Amy Tang](https://github.com/tang-amy)
 - [Benjamin Kosiborod](https://github.com/bendavp) (myself)
 
 ### Description:
